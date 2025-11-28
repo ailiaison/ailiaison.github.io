@@ -994,7 +994,7 @@ ttsBtn.addEventListener("click", async () => {
 
     ttsDownload.href = url;
     ttsDownload.download = `officer_strategy_${lang}.mp3`;
-    ttsDownload.style.display = "inline-block";
+    ttsDownload.style.display = "inline-flex";
 
     if (window.WaveSurfer && ttsWaveform) {
       if (!waveSurfer) {
