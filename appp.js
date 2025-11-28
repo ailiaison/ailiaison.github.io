@@ -853,7 +853,6 @@ function initCollapsibles() {
       body.style.maxHeight = body.scrollHeight + "px";
     });
   });
-}
 
 /* ============= форма, состояние, TTS ============= */
 
