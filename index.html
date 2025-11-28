@@ -2,264 +2,250 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Liaison Officer — ECOWAS × Russia CBDC Corridor</title>
+  <title>AI Liaison Officer — logistics deal calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Интер / Space Grotesk для современного тех-стиля -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- Three.js (глобальный THREE) -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+  <!-- Font Awesome icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="styless.css" />
 </head>
 <body>
-  <!-- Фон с Three.js -->
-  <canvas id="bg"></canvas>
+  <div class="app">
+    <header>
+      <h1>AI Liaison Officer</h1>
 
-  <div class="page">
-    <header class="site-header">
-      <div class="logo">
-        <span class="logo-mark">◎</span>
-        <span class="logo-text">AI Liaison Officer</span>
+      <!-- API block in header -->
+      <div class="api-header-block">
+        <fieldset>
+          <legend>AI API key</legend>
+          <label for="aiApiKey">OpenAI-compatible API key</label>
+          <input
+            id="aiApiKey"
+            type="password"
+            placeholder="sk-..."
+            autocomplete="off"
+          />
+        </fieldset>
       </div>
-      <nav class="nav">
-        <a href="#cargoX">CargoX</a>
-        <a href="#cbdc">CBDC Rail</a>
-        <a href="#web3">Web3 Mesh</a>
-        <a href="#partners">ECOWAS × Russia</a>
-      </nav>
-      <a class="cta-pill" href="#contact">Request pilot</a>
     </header>
 
+    <!-- 8 market tiles -->
+    <section class="market-grid" id="marketGrid">
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-oil-well"></i><span>WTI</span>
+        </div>
+        <div class="market-price" data-market-key="WTI">
+          <span class="currency">$</span><span class="value">60.73</span><span class="unit">/bbl</span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fas fa-gas-pump icon"></i><span>BRENT</span>
+        </div>
+        <div class="market-price" data-market-key="BRENT">
+          <span class="currency">$</span><span class="value">63.55</span><span class="unit">/bbl</span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-wheat-awn"></i><span>WHEAT</span>
+        </div>
+        <div class="market-price" data-market-key="WHEAT">
+          <span class="currency">$</span><span class="value">232.00</span><span class="unit">/t</span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-seedling"></i><span>FERTILIZERS</span>
+        </div>
+        <div class="market-price" data-market-key="FERT">
+          <span class="currency">$</span><span class="value">519.51</span><span class="unit">/t</span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-magnet"></i><span>NEODYMIUM</span>
+        </div>
+        <div class="market-price" data-market-key="REE_ND">
+          <span class="currency">$</span><span class="value">75.00</span>
+          <span class="unit">/kg<span class="suffix">Nd₂O₃</span></span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-atom"></i><span>DYSPROSIUM</span>
+        </div>
+        <div class="market-price" data-market-key="REE_DY">
+          <span class="currency">$</span><span class="value">350.00</span>
+          <span class="unit">/kg<span class="suffix">Dy₂O₃</span></span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-circle-nodes"></i><span>TERBIUM</span>
+        </div>
+        <div class="market-price" data-market-key="REE_TB">
+          <span class="currency">$</span><span class="value">1500.00</span>
+          <span class="unit">/kg<span class="suffix">Tb₄O₇</span></span>
+        </div>
+      </div>
+
+      <div class="market-card">
+        <div class="market-label">
+          <i class="fa-solid fa-earth-asia"></i><span>REE INDEX</span>
+        </div>
+        <div class="market-price" data-market-key="REE_IDX">
+          <span class="currency">$</span><span class="value">120.00</span>
+          <span class="unit">/kg<span class="suffix">basket</span></span>
+        </div>
+      </div>
+    </section>
+
     <main>
-      <!-- HERO -->
-      <section class="hero">
-        <div class="hero-text">
-          <p class="eyebrow">ECOWAS × Russia · CBDC Trade Corridor</p>
-          <h1>
-            Unified <span class="accent-gradient">e-BOL</span>,<br />
-            <span class="accent-gradient">CBDC</span> & Web3 connectivity
-          </h1>
-          <p class="hero-subtitle">
-            AI-driven liaison layer that orchestrates CargoX eBOL documents,
-            EMTECH e-Cedi infrastructure, Russian Digital Ruble rails and Web3 smart contracts
-            into one programmable trade corridor.
-          </p>
-          <div class="hero-actions">
-            <a href="#cargoX" class="btn primary">Explore architecture</a>
-            <a href="#partners" class="btn ghost">For ECOWAS & Russian partners</a>
+      <!-- Parameters: collapsible -->
+      <section id="paramsCard" class="column card collapsible collapsed">
+        <h2>Parameters</h2>
+        <div class="card-body">
+          <div class="hint">
+            Fill in basic deal parameters and click “Run full calculation”.
           </div>
-          <div class="hero-tags">
-            <span>Inspired by CargoX</span>
-            <span>Powered by EMTECH-style CBDC stacks</span>
-            <span>Networked like libp2p</span>
-          </div>
+          <form id="routeForm">
+            <fieldset>
+              <legend>Deal</legend>
+
+              <label for="cargoType">Cargo type</label>
+              <input
+                id="cargoType"
+                type="text"
+                placeholder="e.g. crude oil, LNG, coal, wheat"
+              />
+
+              <div class="row">
+                <div>
+                  <label for="cargoVolume">Volume (tonnes)</label>
+                  <input
+                    id="cargoVolume"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 50000"
+                  />
+                </div>
+              </div>
+
+              <label for="origin">From (port / region)</label>
+              <input
+                id="origin"
+                type="text"
+                placeholder="e.g. Novorossiysk, Russia"
+              />
+
+              <label for="destination">To (port / region)</label>
+              <input
+                id="destination"
+                type="text"
+                placeholder="e.g. Houston, USA / Lagos, Nigeria"
+              />
+            </fieldset>
+
+            <button type="submit">Run full calculation</button>
+          </form>
         </div>
-        <div class="hero-sidecard">
-          <div class="sidecard-header">
-            <span class="dot green"></span>
-            <span class="dot blue"></span>
-            <span class="dot violet"></span>
+      </section>
+
+      <!-- Result: collapsible -->
+      <section id="resultCard" class="column card collapsible collapsed">
+        <h2>Result</h2>
+        <div class="card-body">
+          <div id="status"></div>
+          <div id="loader" class="loader">
+            <div class="spinner"></div>
+            <span>Calculating route, costs and risks...</span>
           </div>
-          <div class="sidecard-body">
-            <h2>Live corridor snapshot</h2>
-            <p class="sidecard-sub">
-              Prototype view for AI Liaison Officer orchestrator.
-            </p>
-            <div class="sidecard-grid">
-              <div class="metric">
-                <span class="metric-label">ECOWAS lanes</span>
-                <span class="metric-value">12</span>
-                <span class="metric-foot">Ghana, Nigeria, Côte d’Ivoire, Senegal…</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">CargoX envelopes</span>
-                <span class="metric-value">48</span>
-                <span class="metric-foot">eBOL / eBL / trade documents</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">CBDC rails</span>
-                <span class="metric-value">3</span>
-                <span class="metric-foot">e-Cedi, Digital Ruble, pilot rails</span>
-              </div>
-              <div class="metric">
-                <span class="metric-label">Web3 meshes</span>
-                <span class="metric-value">∞</span>
-                <span class="metric-foot">tokenized claims & smart flows</span>
-              </div>
+
+          <div id="summary" class="block"></div>
+          <div id="dealMetrics" class="block"></div>
+
+          <!-- full text report -->
+          <div id="reportFull" class="block"></div>
+
+          <!-- financial strategy block -->
+          <div id="finance" class="block"></div>
+
+          <div id="costs" class="block"></div>
+          <div id="legs" class="block"></div>
+          <div id="risks" class="block"></div>
+
+          <div id="audioBlock" class="block">
+            <h3>Audio briefing</h3>
+            <p>Generate a voice-over description of the strategy to send to partners.</p>
+
+            <label for="ttsLang">Voice-over language</label>
+            <select id="ttsLang">
+              <option value="en" selected>English</option>
+              <option value="ru">Russian</option>
+              <option value="zh">Chinese (Mandarin)</option>
+            </select>
+
+            <button id="ttsBtn" type="button" disabled>
+              Generate audio briefing
+            </button>
+
+            <div class="tts-controls">
+              <button id="ttsPlayPause" type="button" disabled>
+                <i class="fa-solid fa-play"></i>
+              </button>
+              <button id="ttsStop" type="button" disabled>
+                <i class="fa-solid fa-stop"></i>
+              </button>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- CargoX / eBOL section -->
-      <section id="cargoX" class="section section-split">
-        <div class="section-content">
-          <h2>CargoX eBOL / eBL as the document backbone</h2>
-          <p>
-            The platform uses CargoX-style secure document envelopes as the single source of truth
-            for bills of lading, letters of credit, insurance and compliance certificates.
-            AI Liaison Officer builds deals from logistics, risk and finance parameters and then
-            automatically composes and sends standard envelopes via API.
-          </p>
-          <ul class="bullet-list">
-            <li>Standard envelopes with structured metadata and attached eBOL / trade docs</li>
-            <li>Immutable document hashes mirrored into Web3 TradeAgreement contracts</li>
-            <li>Document lifecycle events streamed into the orchestration layer</li>
-          </ul>
-        </div>
-        <div class="section-card glass">
-          <h3>Document stream</h3>
-          <div class="doc-row">
-            <span class="pill pill-green">eBOL</span>
-            <span class="doc-title">Crude Oil · Takoradi → Ust-Luga</span>
-            <span class="doc-status ok">Issued</span>
-          </div>
-          <div class="doc-row">
-            <span class="pill pill-blue">Invoice</span>
-            <span class="doc-title">FOB ECOWAS Cargo Basket</span>
-            <span class="doc-status pending">Awaiting endorsement</span>
-          </div>
-          <div class="doc-row">
-            <span class="pill pill-violet">Policy</span>
-            <span class="doc-title">Marine risk cover · multi-carrier</span>
-            <span class="doc-status ok">On-chain hash</span>
-          </div>
-          <div class="hash-preview">
-            <span class="hash-label">eBOL hash → Web3</span>
-            <code>0x9f2a…c4e7 · TradeAgreement#124</code>
-          </div>
-        </div>
-      </section>
+            <!-- Wavesurfer container -->
+            <div id="ttsWaveform" class="tts-waveform"></div>
 
-      <!-- CBDC / EMTECH / Digital Ruble -->
-      <section id="cbdc" class="section section-grid">
-        <header class="section-header">
-          <h2>CBDC rails: e-Cedi × Digital Ruble corridor</h2>
-          <p>
-            Inspired by EMTECH’s modern central banking infrastructure and Ghana’s e-Cedi pilots,
-            AI Liaison Officer treats CBDC as programmable settlement rails for ECOWAS ↔ Russia trade.
-          </p>
-        </header>
-        <div class="grid-3">
-          <article class="info-card">
-            <h3>e-Cedi rail (Ghana / ECOWAS)</h3>
-            <p>
-              Institutional wallets and CBDC movements exposed via EMTECH-style APIs.
-              The backend orchestrator can allocate, hold and release e-Cedi balances
-              per shipment and per route.
-            </p>
-            <ul class="bullet-list compact">
-              <li>Wallets for ECOWAS energy & commodity exporters</li>
-              <li>Programmable holds linked to CargoX envelopes</li>
-              <li>Events mirrored into smart contracts</li>
-            </ul>
-          </article>
-
-          <article class="info-card">
-            <h3>Digital Ruble rail (Russia)</h3>
-            <p>
-              On the Russian side the system integrates with bank / central bank APIs
-              for Digital Ruble, synchronizing CBDC settlements with logistic and legal events.
-            </p>
-            <ul class="bullet-list compact">
-              <li>Settlement for Russian importers & refiners</li>
-              <li>Alignment with national CBDC regulations</li>
-              <li>Bridging ECOWAS and Russian banking corridors</li>
-            </ul>
-          </article>
-
-          <article class="info-card">
-            <h3>Hybrid & FX layer</h3>
-            <p>
-              Where CBDC is not yet available, the orchestrator falls back to classic
-              trade-finance, tokenized claims and FX rails, keeping the same unified interface.
-            </p>
-            <ul class="bullet-list compact">
-              <li>Letters of credit, guarantees, forfaiting</li>
-              <li>Tokenized receivables on Web3 networks</li>
-              <li>Risk-weighted routing of payment flows</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <!-- Web3 / libp2p style networking -->
-      <section id="web3" class="section section-split reverse">
-        <div class="section-content">
-          <h2>Web3 mesh: Trade Agreements on programmable networks</h2>
-          <p>
-            Inspired by libp2p’s modular networking stack, the corridor treats TradeAgreement
-            contracts as a mesh of programmable commitments referencing CargoX documents
-            and CBDC payments.
-          </p>
-          <ul class="bullet-list">
-            <li>On-chain TradeAgreement with eBOL hash, parties and milestones</li>
-            <li>Tokenized payment claims and risk tranches for institutional investors</li>
-            <li>Oracle-driven updates from CargoX, e-Cedi and Digital Ruble rails</li>
-          </ul>
-        </div>
-        <div class="section-card mesh-card">
-          <div class="mesh-header">
-            <span class="mesh-node main">TA-124</span>
-            <span class="mesh-node">CBDC-GH</span>
-            <span class="mesh-node">CBDC-RU</span>
-            <span class="mesh-node">FX-POOL</span>
+            <!-- hidden <audio> for download -->
+            <audio id="ttsAudio" style="display:none;"></audio>
+            <a
+              id="ttsDownload"
+              href="#"
+              download
+              style="display:none;font-size:0.78rem;margin-top:4px;display:inline-block;"
+            >
+              Download audio (MP3)
+            </a>
           </div>
-          <div class="mesh-body">
-            <p class="mesh-caption">
-              Conceptual mesh of TradeAgreement & payment adapters
-              visualized like a libp2p topology.
-            </p>
-            <ul class="mesh-list">
-              <li><span class="dot tiny green"></span> CargoX oracle → shipment status</li>
-              <li><span class="dot tiny blue"></span> e-Cedi oracle → ECOWAS CBDC settlement</li>
-              <li><span class="dot tiny violet"></span> Digital Ruble oracle → Russian CBDC settlement</li>
-            </ul>
-          </div>
-        </div>
-      </section>
 
-      <!-- Partners / George -->
-      <section id="partners" class="section section-wide">
-        <header class="section-header">
-          <h2>ECOWAS & Russian partners · Liaison network</h2>
-          <p>
-            The corridor is coordinated by liaison officers representing ECOWAS and Russian
-            energy & commodity companies. The architecture is open to central banks,
-            financial regulators, trade-finance providers and port authorities.
-          </p>
-        </header>
-        <div class="pill-row">
-          <span class="pill pill-soft">Energy & commodity exporters</span>
-          <span class="pill pill-soft">Ports & terminal operators</span>
-          <span class="pill pill-soft">Trade-finance banks</span>
-          <span class="pill pill-soft">Central banks & regulators</span>
-          <span class="pill pill-soft">Legal & compliance partners</span>
-        </div>
-        <div class="liaison-card" id="contact">
-          <h3>Liaison contact</h3>
-          <p>
-            <strong>George Kwa</strong> — liaison officer from Ghana, representing ECOWAS and
-            Russian energy & commodity companies and the alliance of liaison officers
-            across all ECOWAS countries and Russia.
-          </p>
-          <p class="liaison-foot">
-            Partner companies may nominate George Kwa as their official contact person
-            and provide company documentation for onboarding into the corridor.
-          </p>
+          <div class="block">
+            <h3>Raw JSON</h3>
+            <pre id="rawJson">— no data yet —</pre>
+          </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>Concept landing · AI Liaison Officer · ECOWAS × Russia CBDC Corridor</span>
-      <span class="footer-links">
-        Visual style inspired by EMTECH, CargoX, libp2p · Three.js prototype background
-      </span>
+    <footer>
+      Prototype. Real prices, risks and legal constraints must be checked with live analysts, brokers and banks.
     </footer>
   </div>
 
-  <script src="main.js"></script>
+  <!-- Wavesurfer for audio visualisation -->
+  <script src="https://unpkg.com/wavesurfer.js@7"></script>
+
+  <!-- Finance strategies & external offers -->
+  <script src="financeModule.js"></script>
+
+  <!-- Main app logic -->
+  <script src="appp.js"></script>
 </body>
 </html>
