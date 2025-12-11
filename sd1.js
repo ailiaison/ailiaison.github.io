@@ -119,7 +119,7 @@
     "}" +
     ".sd-index-value{font-size:1.8rem;font-weight:700;}" +
     ".sd-index-caption{" +
-      "font-size:0.74rem;color:var(--text-muted,#9ca3af);max-width:220px;text-align:right;" +
+      "font-size:0.74rem;color:var(--text-muted,#9ca3af);max-width:220px;text-align:right;display:none;" +
     "}" +
     ".sd-index-trend{font-size:0.76rem;margin-top:2px;}" +
     ".sd-index-trend-pos{color:#4ade80;}" +
