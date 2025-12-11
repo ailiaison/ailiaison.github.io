@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>от 12 стран партнёров — карта коммерческого потенциала и маршрутов</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    ::-webkit-scrollbar { width: 0; }
+    :root{
+      --bg:#0f1724; --card:rgba(15, 23, 42, 0.3); --accent:#00b894; --muted:#94a3b8;
+      --glass: rgba(255, 255, 255, 0.08); --glass-bright: rgba(255, 255, 255, 0.12);
+      --contract-bg: rgba(255, 255, 255, 0.06); --glass-border: rgba(255, 255, 255, 0.18);
+    }
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, Helvetica, Arial; background:linear-gradient(180deg,#071029 0%, #0b1630 100%); color:#e6eef8}
+    .app{display:grid;grid-template-columns:480px 1fr;gap:18px;height:100vh;padding:18px}
+    .panel{background:transparent;backdrop-filter:blur(0px);border-radius:0;padding:0;box-shadow:none}
+    .sidebar{overflow:auto;position:relative;padding:16px;background:rgba(255, 255, 255, 0.05);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-radius:16px;border:1px solid rgba(255, 255, 255, 0.18);box-shadow:0 8px 32px rgba(0, 0, 0, 0.1)}
+    h1{font-size:18px;margin:0 0 8px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .btn{background:rgba(255, 255, 255, 0.08);backdrop-filter:blur(10px);border:1px solid rgba(255, 255, 255, 0.18);padding:10px 14px;border-radius:10px;color:#e6eef8;cursor:pointer;transition:all 0.3s ease;font-size:13px;font-weight:500}
+    .btn:hover{background:rgba(255, 255, 255, 0.12);border-color:rgba(255, 255, 255, 0.25);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0, 0, 0, 0.15)}
+    .btn.primary{background:rgba(0, 184, 148, 0.2);border-color:rgba(0, 184, 148, 0.4);color:#00b894}
+    .btn.primary:hover{background:rgba(0, 184, 148, 0.3);border-color:rgba(0, 184, 148, 0.5);box-shadow:0 4px 16px rgba(0, 184, 148, 0.2)}
+    label{display:block;font-size:12px;color:var(--muted);margin-top:8px}
+    .map-wrap{position:relative;overflow:hidden;border-radius:12px}
+    #mapContainer{width:100%;height:100%;background:linear-gradient(180deg,#07203a 0%,#05314a 100%);display:flex;align-items:center;justify-content:center}
+    svg{max-width:100%;height:auto;display:block}
+    div#globalTotals {font-size: 1.2em;}
+    .country{fill:#0f3044;stroke:#08354a;stroke-width:1;cursor:pointer;transition:fill .18s, transform .1s}
+    .country.hover{fill:#0c5472}
+    .country.selected{fill:var(--accent);opacity:0.95}
+    path#Kamerun {fill: #a0e200 !important;}
+    .country.ecowas-member{fill:#0f3044;stroke:#08354a}
+    .route-point circle{r:5;fill:#00e0b0;stroke:#003b2e;stroke-width:1;cursor:pointer}
+    .route-line{fill:none;stroke:#00e0b088;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    .tooltip{position:fixed;pointer-events:none;padding:8px 10px;border-radius:8px;background:linear-gradient(180deg,rgba(2,6,23,0.9),rgba(2,6,23,0.75));border:1px solid rgba(255,255,255,0.04);font-size:13px;color:#dbeafe;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .country-info{margin-top:12px;padding:14px;background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(10px);border-radius:12px;border:1px solid rgba(255, 255, 255, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.05)}
+    .metric{display:flex;justify-content:space-between;font-size:13px;margin-top:8px;padding:8px 0;border-bottom:1px solid rgba(255, 255, 255, 0.05)}
+    .metric:last-child{border-bottom:none}
+    .ports-list{margin-top:8px}
+    .port{display:flex;justify-content:space-between;padding:10px 12px;border-radius:10px;background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(8px);border:1px solid rgba(255, 255, 255, 0.1);margin-bottom:8px;transition:all 0.2s ease}
+    .port:hover{background:rgba(255, 255, 255, 0.1);border-color:rgba(255, 255, 255, 0.15)}
+    table{width:100%;border-collapse:collapse;background:rgba(255, 255, 255, 0.02);backdrop-filter:blur(6px);border-radius:8px;overflow:hidden}
+    td,th{padding:10px 12px;border-bottom:1px solid rgba(255, 255, 255, 0.08);font-size:13px}
+    td:last-child, th:last-child{border-bottom:none}
+    div#waypointsList {margin-top: 8px;overflow-y: auto;height: 125px;padding:8px;background:rgba(255, 255, 255, 0.03);backdrop-filter:blur(6px);border-radius:8px;border:1px solid rgba(255, 255, 255, 0.08)}
+    div#waypointsList::-webkit-scrollbar{width:6px}
+    div#waypointsList::-webkit-scrollbar-track{background:rgba(255,255,255,0.02);border-radius:3px}
+    div#waypointsList::-webkit-scrollbar-thumb{background:rgba(0,184,148,0.3);border-radius:3px}
+    div#waypointsList::-webkit-scrollbar-thumb:hover{background:rgba(0,184,148,0.5)}
+    .contract{background:rgba(255, 255, 255, 0.08);backdrop-filter:blur(12px);padding:16px;border-radius:14px;border:1px solid rgba(255, 255, 255, 0.15);margin-top:12px;box-shadow:0 4px 20px rgba(0, 0, 0, 0.08)}
+    .contract h3{margin:0 0 8px}
+    .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255, 255, 255, 0.15);background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(8px);color:#e6eef8;transition:all 0.3s ease;font-size:13px}
+    .input:focus{outline:none;border-color:rgba(0, 184, 148, 0.4);background:rgba(255, 255, 255, 0.1);box-shadow:0 0 0 3px rgba(0, 184, 148, 0.1)}
+    .input::placeholder{color:rgba(148, 163, 184, 0.6)}
+    select.input{background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(8px);color:#e6eef8;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300b894' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+    select.input option{background:rgba(15, 23, 42, 0.95);color:#e6eef8;padding:8px}
+    select.input:focus{outline:none;border-color:rgba(0, 184, 148, 0.4);background-color:rgba(255, 255, 255, 0.1);box-shadow:0 0 0 3px rgba(0, 184, 148, 0.1)}
+    .footer{display:flex;gap:8px;align-items:center;margin-top:16px;padding:12px;background:rgba(255, 255, 255, 0.04);backdrop-filter:blur(8px);border-radius:10px;border:1px solid rgba(255, 255, 255, 0.08)}
+    .small{font-size:20px;color:rgba(148, 163, 184, 0.8)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    @media (max-width:900px){ .app{grid-template-columns:1fr;grid-template-rows:420px 1fr} }
+    /* Масштаб */
+    tspan#tspan2603 { fill:white;stroke:white !important; }
+    path#path2595 { fill:white; stroke: white !important; }
+    path#path2597 { fill: white !important;stroke: white !important;}
+    tspan#tspan6401 { fill: white;stroke: white !important; }
+    path#path2599 {fill: white !important; stroke: white !important;}
+    tspan#tspan2611 { fill: white; stroke: white !important; }
+    tspan#tspan2607 { fill: white !important;stroke: white !important;}
+  </style>
+    <style>
+    /* Виджет цен — GlassMorphism стиль */
+    .widget{/*background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(12px);*/border-radius:14px;/*padding:16px;border:1px solid rgba(255, 255, 255, 0.12);box-shadow:0 4px 20px rgba(0, 0, 0, 0.08);*/width:100%}
+    .widget-title{color:var(--accent);text-align:center;margin-bottom:10px;font-size:1rem;font-weight:600}
+    .prices-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:8px}
+    .price-item{background:rgba(255, 255, 255, 0.08);backdrop-filter:blur(10px);border-radius:12px;padding:14px;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(255, 255, 255, 0.12);transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05)}
+    .price-item:hover{background:rgba(255, 255, 255, 0.12);border-color:rgba(255, 255, 255, 0.18);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0, 0, 0, 0.1)}
+    .price-item .icon{font-size:5.2rem;margin-bottom:6px;color:var(--accent);color: white;}
+    .commodity-name{color:#cfe9ff;font-size:1.5rem;margin-bottom:4px}
+    .price{color:#fff;font-size:3rem;font-weight:900}
+    .widget .footer{font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
+
+    /* Стили для вертикального аккордеона - GlassMorphism */
+    .accordion-container{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .accordion-item{background:rgba(255, 255, 255, 0.06);backdrop-filter:blur(10px);border-radius:12px;overflow:hidden;border:1px solid rgba(255, 255, 255, 0.12);transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05)}
+    .accordion-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none;background:rgba(255, 255, 255, 0.04);backdrop-filter:blur(8px);transition:all 0.3s ease;border-bottom:1px solid transparent}
+    .accordion-header:hover{background:rgba(255, 255, 255, 0.08);border-color:rgba(255, 255, 255, 0.15)}
+    .accordion-header.active{background:rgba(0, 184, 148, 0.15);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0, 184, 148, 0.3);box-shadow:0 2px 12px rgba(0, 184, 148, 0.1)}
+    .accordion-header strong{text-transform:uppercase;color:#e6eef8;font-size:13px;font-weight:600}
+    .accordion-icon{color:var(--accent);font-size:14px;transition:transform 0.3s ease;flex-shrink:0;margin-left:10px}
+    .accordion-header.active .accordion-icon{transform:rotate(180deg)}
+    .accordion-content{max-height:0;overflow:hidden;transition:max-height 0.3s ease, padding 0.3s ease;padding:0 16px;/*background:rgba(255, 255, 255, 0.03);backdrop-filter:blur(8px);*/}
+    .accordion-content.active{max-height:2000px;padding:16px;overflow-y:auto;/*background:rgba(255, 255, 255, 0.04);*/}
+    .accordion-content#accordion-routes.active{max-height:500px}
+    .accordion-content.active::-webkit-scrollbar{width:6px}
+    .accordion-content.active::-webkit-scrollbar-track{background:rgba(255,255,255,0.02);border-radius:3px}
+    .accordion-content.active::-webkit-scrollbar-thumb{background:rgba(0,184,148,0.3);border-radius:3px}
+    .accordion-content.active::-webkit-scrollbar-thumb:hover{background:rgba(0,184,148,0.5)}
+
+    /* Панель управления на карте */
+    .map-controls-panel{position:absolute;top:12px;left:12px;z-index:1000;background:var(--card);backdrop-filter:blur(8px);border-radius:10px;padding:10px;box-shadow:0 4px 16px rgba(2,6,23,0.7);border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px;min-width:200px}
+    .map-control-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background 0.2s ease}
+    .map-control-item:hover{background:rgba(255,255,255,0.05)}
+    .map-control-item label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#e6eef8;margin:0;user-select:none;flex:1}
+    .map-control-item input[type="checkbox"]{width:18px;height:18px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
+    .map-control-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:8px 12px;border-radius:8px;color:#e6eef8;cursor:pointer;font-size:13px;transition:all 0.2s ease;flex:1;text-align:center}
+    .map-control-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(0,184,148,0.3);color:var(--accent)}
+    .map-control-btn.primary{background:rgba(0,184,148,0.15);border-color:var(--accent);color:var(--accent)}
+    .map-control-btn.primary:hover{background:rgba(0,184,148,0.25)}
+
+    /* Система всплывающих уведомлений (Toast) */
+    .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{background:var(--card);backdrop-filter:blur(10px);border-radius:10px;padding:14px 18px;box-shadow:0 8px 24px rgba(2,6,23,0.8);border:1px solid rgba(255,255,255,0.1);min-width:300px;max-width:400px;pointer-events:auto;transform:translateX(400px);opacity:0;transition:all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);display:flex;align-items:center;gap:12px}
+    .toast.show{transform:translateX(0);opacity:1}
+    .toast.hide{transform:translateX(400px);opacity:0}
+    .toast-icon{font-size:20px;flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+    .toast.success .toast-icon{color:var(--accent)}
+    .toast.info .toast-icon{color:#60a5fa}
+    .toast.warning .toast-icon{color:#fbbf24}
+    .toast.error .toast-icon{color:#f87171}
+    .toast-content{flex:1;color:#e6eef8;font-size:14px;line-height:1.5}
+    .toast-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;transition:color 0.2s;flex-shrink:0}
+    .toast-close:hover{color:#e6eef8}
+
+    /* Диалоговое окно для confirm */
+    .dialog-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(2,6,23,0.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
+    .dialog-overlay.show{opacity:1;pointer-events:auto}
+    .dialog{background:var(--card);backdrop-filter:blur(10px);border-radius:12px;padding:24px;box-shadow:0 12px 32px rgba(2,6,23,0.9);border:1px solid rgba(255,255,255,0.1);min-width:320px;max-width:400px;transform:scale(0.9);opacity:0;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+    .dialog-overlay.show .dialog{transform:scale(1);opacity:1}
+    .dialog-title{font-size:18px;font-weight:600;color:#e6eef8;margin:0 0 12px}
+    .dialog-message{font-size:14px;color:var(--muted);margin:0 0 20px;line-height:1.5}
+    .dialog-buttons{display:flex;gap:10px;justify-content:flex-end}
+    .dialog-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:10px 20px;border-radius:8px;color:#e6eef8;cursor:pointer;font-size:14px;transition:all 0.2s;min-width:80px}
+    .dialog-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(0,184,148,0.3)}
+    .dialog-btn.primary{background:rgba(0,184,148,0.15);border-color:var(--accent);color:var(--accent)}
+    .dialog-btn.primary:hover{background:rgba(0,184,148,0.25)}
+    .dialog-btn.danger{background:rgba(248,113,113,0.15);border-color:#f87171;color:#f87171}
+    .dialog-btn.danger:hover{background:rgba(248,113,113,0.25)}
+  </style>
+</head>
+<body>
+    <div class="app">
+    <aside class="panel sidebar">
+      <div class="widget" id="pricesWidget">
+        <div style="display:none;" class="widget-title">Актуальные цены на сырьё</div>
+        <div class="prices-grid">
+            <div class="price-item">
+                <i class="fas fa-oil-well icon"></i>
+                <div class="commodity-name">WTI</div>
+                <div class="price" id="price-WTI">$60.73</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-gas-pump icon"></i>
+                <div class="commodity-name">BRENT</div>
+                <div class="price" id="price-BRENT">$63.55</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-wheat-alt icon"></i>
+                <div class="commodity-name">ПШЕНИЦА</div>
+                <div class="price" id="price-WHEAT">$232</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-leaf icon"></i>
+                <div class="commodity-name">УДОБРЕНИЯ</div>
+                <div class="price" id="price-FERT">$519.51</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-gem icon"></i>
+                <div class="commodity-name">ЗОЛОТО</div>
+                <div class="price" id="price-GOLD">$2,450</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-atom icon"></i>
+                <div class="commodity-name">НЕОДИМ</div>
+                <div class="price" id="price-NEODYMIUM">$85.50</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-magnet icon"></i>
+                <div class="commodity-name">ДИСПРОЗИЙ</div>
+                <div class="price" id="price-DYSPROSIUM">$320.00</div>
+            </div>
+            <div class="price-item">
+                <i class="fas fa-vial icon"></i>
+                <div class="commodity-name">ПРАЗЕОДИМ</div>
+                <div class="price" id="price-PRASEODYMIUM">$78.20</div>
+            </div>
+        </div>
+       <!-- <div class="footer" id="pricesUpdated">Обновлено: —</div> -->
+      </div>
+
+      <div class="accordion-container">
+        <!-- Секция "Годовой экспорт" -->
+        <div class="accordion-item">
+          <div class="accordion-header" data-accordion="totals">
+            <strong>Годовой экспорт</strong>
+            <i class="fas fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content" id="accordion-totals">
+            <div id="globalTotals"><div style="display:flex;justify-content:space-between"><div>Зерно</div><div>2&nbsp;058 <span class="small">тыс. тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Удобрения</div><div>79 <span class="small">тыс. тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Нефть</div><div>5&nbsp;370 <span class="small">тыс. баррелей/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Газ</div><div>2&nbsp;100 <span class="small">млн м³/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Золото</div><div>300 <span class="small">тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Железная руда</div><div>590 <span class="small">тыс. тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Медная руда</div><div>65 <span class="small">тыс. тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>Боксит</div><div>1&nbsp;020 <span class="small">тыс. тонн/год</span></div></div><div style="display:flex;justify-content:space-between"><div>РЗМ</div><div>35 <span class="small">тонн/год</span></div></div></div>
+          </div>
+        </div>
+
+        <!-- Секция "Параметры сделки" -->
+        <div class="accordion-item">
+          <div class="accordion-header" data-accordion="deal">
+            <strong>Параметры сделки</strong>
+            <i class="fas fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content" id="accordion-deal">
+            <div style="margin-top:8px" class="row"><select id="dealCommodity" class="input"></select></div>
+            <div style="margin-top:8px" class="row"><input id="dealQuantity" class="input" style="width: 96%;" type="number" min="0" step="1" placeholder="Количество (число)"/></div>
+            <div style="margin-top:8px" class="row"><input id="dealPrice" class="input" style="width: 96%;" type="number" min="0" step="0.01" placeholder="Цена за единицу (USD)"/></div>
+            <div style="margin-top:8px" class="row"><select id="dealFrom" class="input"></select></div>
+            <div style="margin-top:8px" class="row"><select id="dealTo" class="input"></select></div>
+            <div style="margin-top:8px" class="row"><input id="dealDate" class="input" style="width: 96%;" type="date"/></div>
+
+            <div class="contract" id="contractCard">
+              <h3 style="text-transform: uppercase;">Текущий смарт-контракт</h3>
+              <div id="contractParams">Задайте параметры сделки слева — контракт обновится.</div>
+              <div style="margin-top:8px;display:flex;gap:8px"><button id="signContract" class="btn primary">Подписать контракт</button><button id="simulateCost" class="btn">Рассчитать фрахт</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Секция "Морские маршруты" -->
+        <div class="accordion-item">
+          <div class="accordion-header" data-accordion="routes">
+            <strong>Морские маршруты</strong>
+            <i class="fas fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content" id="accordion-routes">
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button id="exportRoute" class="btn primary">Экспорт GeoJSON</button>
+              <button id="exportBtn" class="btn primary">Экспорт портов (JSON)</button>
+            </div>
+            <div id="routeSummary" style="margin-top:8px" class="small">Маршрут: нет данных</div>
+            <div id="waypointsList" style="margin-top:8px" class="small">Точки маршрута: —</div>
+            <div class="small" style="margin-top:6px">Левый клик — добавить точку; правый клик — удалить ближайшую точку маршрута (в режиме прокладки).</div>
+          </div>
+        </div>
+
+        <!-- Секция "Информация о стране" -->
+        <div class="accordion-item">
+          <div class="accordion-header" data-accordion="country">
+            <strong>Информация о стране</strong>
+            <i class="fas fa-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-content" id="accordion-country">
+            <div id="countryInfo">
+              <div class="small">Выберите страну на карте, чтобы увидеть данные</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer small">Лицензия исходной карты: CC BY-SA (Wikimedia Commons).</div>
+    </aside>
+
+    <main class="panel map-wrap">
+      <div class="map-controls-panel">
+        <div class="map-control-item">
+          <label>
+            <input id="routeMode" type="checkbox">
+            <span>Режим прокладки</span>
+          </label>
+        </div>
+        <button id="clearRoute" class="map-control-btn">Очистить маршрут</button>
+        <button id="resetBtn" class="map-control-btn">Сбросить вид</button>
+      </div>
+      <div id="mapContainer">
+        <div style="color:var(--muted);text-align:center;padding:18px">Загрузка карты…</div>
+      </div>
+    </main>
+  </div>
+
+  <div id="tooltip" class="tooltip" style="display:none"></div>
+
+  <!-- Контейнер для всплывающих уведомлений -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Контейнер для диалоговых окон -->
+  <div id="dialogOverlay" class="dialog-overlay">
+    <div class="dialog">
+      <div class="dialog-title" id="dialogTitle"></div>
+      <div class="dialog-message" id="dialogMessage"></div>
+      <div class="dialog-buttons" id="dialogButtons"></div>
+    </div>
+  </div>
+
+  <script>
+  // Переопределяем alert и confirm СРАЗУ, до загрузки любых данных
+  // Это гарантирует перехват всех вызовов, даже из внешних скриптов
+  (function(){
+    const originalAlert = window.alert;
+    const originalConfirm = window.confirm;
+    
+    // Временно сохраняем оригинальные функции для использования в наших функциях
+    window._originalAlert = originalAlert;
+    window._originalConfirm = originalConfirm;
+  })();
+
+  // --- Config & data ---
+  const SVG_URL = 'https://upload.wikimedia.org/wikipedia/commons/f/fb/Ecowas_map.svg';
+  const commodities = ['Grain','Fertilizers','Oil','Gas','Gold','IronOre','CopperOre','Bauxite','REE'];
+  const commodityLabels = {Grain:'Зерно',Fertilizers:'Удобрения',Oil:'Нефть',Gas:'Газ',Gold:'Золото',IronOre:'Железная руда',CopperOre:'Медная руда',Bauxite:'Боксит',REE:'РЗМ'};
+  const commodityUnits = {Grain:'тыс. тонн/год',Fertilizers:'тыс. тонн/год',Oil:'тыс. баррелей/год',Gas:'млн м³/год',Gold:'тонн/год',IronOre:'тыс. тонн/год',CopperOre:'тыс. тонн/год',Bauxite:'тыс. тонн/год',REE:'тонн/год'};
+
+  // Русские названия для UI
+  const countryNameMap = {
+    'Benin':'Бенин','Burkina Faso':'Буркина-Фасо','Cabo Verde':'Кабо-Верде',"Côte d'Ivoire":"Кот-д'Ивуар",'Gambia':'Гамбия','Ghana':'Гана','Guinea':'Гвинея','Guinea-Bissau':'Гвинея-Бисау','Liberia':'Либерия','Mali':'Мали','Niger':'Нигер','Nigeria':'Нигерия','Senegal':'Сенегал','Sierra Leone':'Сьерра-Леоне','Togo':'Того','Cameroon':'Камерун','Cameroun':'Камерун','Russia':'Россия'
+  };
+
+  // Данные стран (примерные числа)
+  const countryData = {
+    'Benin': {score:56, gdpBUSD:12.4, top_ports:['Cotonou'], exports:{Grain:120, Fertilizers:5, Oil:0, Gas:0, Gold:2, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:300, Fertilizers:80, Oil:600, Gas:120, Gold:0, IronOre:5, CopperOre:2, Bauxite:0, REE:0}},
+    'Burkina Faso': {score:34, gdpBUSD:16.2, top_ports:[], exports:{Grain:80, Fertilizers:2, Oil:0, Gas:0, Gold:60, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:150, Fertilizers:30, Oil:40, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Cabo Verde': {score:45, gdpBUSD:1.8, top_ports:['Praia'], exports:{Grain:5, Fertilizers:0, Oil:0, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:40, Fertilizers:2, Oil:120, Gas:20, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    "Côte d'Ivoire": {score:78, gdpBUSD:60.6, top_ports:['Abidjan'], exports:{Grain:500, Fertilizers:20, Oil:40, Gas:10, Gold:8, IronOre:30, CopperOre:5, Bauxite:0, REE:0}, imports:{Grain:200, Fertilizers:60, Oil:300, Gas:40, Gold:0, IronOre:10, CopperOre:5, Bauxite:0, REE:0}},
+    'Gambia': {score:40, gdpBUSD:2.0, top_ports:['Banjul'], exports:{Grain:10, Fertilizers:0, Oil:0, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:30, Fertilizers:5, Oil:40, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Ghana': {score:82, gdpBUSD:74.8, top_ports:['Tema','Takoradi'], exports:{Grain:250, Fertilizers:5, Oil:120, Gas:60, Gold:100, IronOre:0, CopperOre:30, Bauxite:200, REE:5}, imports:{Grain:120, Fertilizers:200, Oil:400, Gas:100, Gold:0, IronOre:10, CopperOre:5, Bauxite:0, REE:0}, exportsUSD:{ Gold:15600000000 }},
+    'Guinea': {score:50, gdpBUSD:16.0, top_ports:['Conakry'], exports:{Grain:30, Fertilizers:0, Oil:0, Gas:0, Gold:10, IronOre:500, CopperOre:0, Bauxite:800, REE:20}, imports:{Grain:50, Fertilizers:10, Oil:40, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, exportsUSD:{ Gold:9650000000, Bauxite:7620000000 }},
+    'Guinea-Bissau': {score:28, gdpBUSD:1.6, top_ports:['Bissau'], exports:{Grain:5, Fertilizers:0, Oil:0, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:20, Fertilizers:2, Oil:30, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Liberia': {score:37, gdpBUSD:3.5, top_ports:['Monrovia'], exports:{Grain:8, Fertilizers:0, Oil:0, Gas:0, Gold:2, IronOre:40, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:40, Fertilizers:5, Oil:50, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Mali': {score:22, gdpBUSD:17.4, top_ports:[], exports:{Grain:40, Fertilizers:0, Oil:0, Gas:0, Gold:70, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:60, Fertilizers:10, Oil:10, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Niger': {score:20, gdpBUSD:16.2, top_ports:[], exports:{Grain:20, Fertilizers:0, Oil:0, Gas:0, Gold:15, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:50, Fertilizers:5, Oil:20, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Nigeria': {score:95, gdpBUSD:514.0, top_ports:['Lagos','Port Harcourt','Onne'], exports:{Grain:800, Fertilizers:30, Oil:5000, Gas:2000, Gold:20, IronOre:0, CopperOre:30, Bauxite:0, REE:10}, imports:{Grain:400, Fertilizers:400, Oil:1000, Gas:300, Gold:0, IronOre:100, CopperOre:50, Bauxite:0, REE:0}, exportsUSD:{ Oil:43500000000, Gas:8380000000, Gold:1540000000, Fertilizers:1050000000 }},
+    'Senegal': {score:66, gdpBUSD:26.5, top_ports:['Dakar','Ziguinchor'], exports:{Grain:90, Fertilizers:5, Oil:10, Gas:0, Gold:5, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:150, Fertilizers:30, Oil:200, Gas:20, Gold:0, IronOre:5, CopperOre:0, Bauxite:0, REE:0}},
+    'Sierra Leone': {score:31, gdpBUSD:4.2, top_ports:['Freetown'], exports:{Grain:10, Fertilizers:0, Oil:0, Gas:0, Gold:6, IronOre:20, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:60, Fertilizers:5, Oil:80, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Togo': {score:48, gdpBUSD:7.5, top_ports:['Lomé'], exports:{Grain:30, Fertilizers:2, Oil:0, Gas:0, Gold:1, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:80, Fertilizers:20, Oil:150, Gas:10, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}},
+    'Cameroon': {score:57, gdpBUSD:39.1, top_ports:['Douala','Kribi'], exports:{Grain:60, Fertilizers:10, Oil:200, Gas:30, Gold:1, IronOre:0, CopperOre:0, Bauxite:20, REE:0}, imports:{Grain:120, Fertilizers:40, Oil:300, Gas:80, Gold:0, IronOre:10, CopperOre:5, Bauxite:0, REE:0}, exportsUSD:{ Grain:200000000, Fertilizers:50000000, Oil:2430000000, Gas:1120000000, Gold:951000000, Bauxite:300000000 }},
+    'Russia': {score:85, gdpBUSD:1700, top_ports:['Novorossiysk'], exports:{Grain:0, Fertilizers:0, Oil:30000, Gas:20000, Gold:50, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, imports:{Grain:0, Fertilizers:0, Oil:0, Gas:0, Gold:0, IronOre:0, CopperOre:0, Bauxite:0, REE:0}, exportsUSD:{Oil:200000000000, Gas:80000000000, Gold:5000000000}}
+  };
+
+  const portsDetails = {
+    'Abidjan':{country:"Côte d'Ivoire", capacityTEU:220000, maxDraft:'14 m', notes:'Главный порт побережья'},
+    'Lagos':{country:'Nigeria', capacityTEU:170000, maxDraft:'13 m', notes:'Крупнейший транзитный узел'},
+    'Tema':{country:'Ghana', capacityTEU:140000, maxDraft:'12 m', notes:'Контейнерный хаб'},
+    'Takoradi':{country:'Ghana', capacityTEU:30000, maxDraft:'10 m', notes:'Генеральные грузы'},
+    'Dakar':{country:'Senegal', capacityTEU:160000, maxDraft:'14 m', notes:'Транзитный хаб региона'},
+    'Lomé':{country:'Togo', capacityTEU:120000, maxDraft:'11 m', notes:'Свободная экономическая зона'},
+    'Cotonou':{country:'Benin', capacityTEU:90000, maxDraft:'10 m', notes:'Региональный хаб'},
+    'Conakry':{country:'Guinea', capacityTEU:40000, maxDraft:'11 m', notes:'Обработка минерального сырья'},
+    'Monrovia':{country:'Liberia', capacityTEU:25000, maxDraft:'10 m', notes:''},
+    'Freetown':{country:'Sierra Leone', capacityTEU:20000, maxDraft:'9 m', notes:''},
+    'Banjul':{country:'Gambia', capacityTEU:8000, maxDraft:'7 m', notes:''},
+    'Bissau':{country:'Guinea-Bissau', capacityTEU:5000, maxDraft:'6 m', notes:''},
+    'Praia':{country:'Cabo Verde', capacityTEU:3000, maxDraft:'7 m', notes:''},
+    'Port Harcourt':{country:'Nigeria', capacityTEU:60000, maxDraft:'12 m', notes:''},
+    'Onne':{country:'Nigeria', capacityTEU:40000, maxDraft:'11 m', notes:''},
+    'Douala':{country:'Cameroon', capacityTEU:90000, maxDraft:'12 m', notes:'Главный порт Камеруна'},
+    'Kribi':{country:'Cameroon', capacityTEU:60000, maxDraft:'14 m', notes:'Глубоководный порт'},
+    'Novorossiysk':{country:'Russia', capacityTEU:100000, maxDraft:'15 m', notes:'Главный глубоководный порт Новороссийска'}
+  };
+
+  const portCoords = {
+    'Abidjan':[5.345317, -4.024429], 'Lagos':[6.524379, 3.379206], 'Tema':[5.6681, -0.0194], 'Takoradi':[4.8833, -1.7647],
+    'Dakar':[14.6937, -17.4441], 'Lomé':[6.1725, 1.2314], 'Cotonou':[6.3703, 2.3912], 'Conakry':[9.6412, -13.5784],
+    'Monrovia':[6.3156, -10.8074], 'Freetown':[8.4657, -13.2317], 'Banjul':[13.4549, -16.5790], 'Bissau':[11.8636, -15.5977],
+    'Praia':[14.9310, -23.5125], 'Port Harcourt':[4.8156, 7.0498], 'Onne':[4.7636, 7.0320],
+    'Douala':[4.0511, 9.7679], 'Kribi':[2.9459, 9.9116], 'Novorossiysk':[44.7236, 37.7689]
+  };
+
+  // Route storage and geo bounds for simple equirectangular mapping
+  let currentRoute = [];
+  const geoBounds = { minLon:-25, maxLon:15, minLat:4, maxLat:17 };
+
+  // Helpers
+  function $(s,root=document){return root.querySelector(s)}
+  function $all(s,root=document){return Array.from(root.querySelectorAll(s))}
+
+  // Система всплывающих уведомлений (Toast)
+  function showToast(message, type = 'info', duration = 4000){
+    const container = $('#toastContainer');
+    if(!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = {
+      success: '<i class="fas fa-check-circle"></i>',
+      info: '<i class="fas fa-info-circle"></i>',
+      warning: '<i class="fas fa-exclamation-triangle"></i>',
+      error: '<i class="fas fa-times-circle"></i>'
+    };
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.info}</div>
+      <div class="toast-content">${message}</div>
+      <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Анимация появления
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    // Автоматическое скрытие
+    if(duration > 0){
+      setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        setTimeout(() => {
+          if(toast.parentElement) toast.remove();
+        }, 400);
+      }, duration);
+    }
+    
+    // Закрытие по клику на крестик
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+      toast.classList.remove('show');
+      toast.classList.add('hide');
+      setTimeout(() => {
+        if(toast.parentElement) toast.remove();
+      }, 400);
+    });
+  }
+
+  // Система диалоговых окон (замена confirm)
+  function showDialog(message, title = 'Подтверждение'){
+    return new Promise((resolve) => {
+      const overlay = $('#dialogOverlay');
+      const dialogTitle = $('#dialogTitle');
+      const dialogMessage = $('#dialogMessage');
+      const dialogButtons = $('#dialogButtons');
+      
+      if(!overlay || !dialogTitle || !dialogMessage || !dialogButtons) {
+        resolve(false);
+        return;
+      }
+      
+      dialogTitle.textContent = title;
+      dialogMessage.textContent = message;
+      dialogButtons.innerHTML = '';
+      
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'dialog-btn';
+      cancelBtn.textContent = 'Отмена';
+      cancelBtn.onclick = () => {
+        overlay.classList.remove('show');
+        setTimeout(() => resolve(false), 300);
+      };
+      
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'dialog-btn primary';
+      confirmBtn.textContent = 'Подтвердить';
+      confirmBtn.onclick = () => {
+        overlay.classList.remove('show');
+        setTimeout(() => resolve(true), 300);
+      };
+      
+      dialogButtons.appendChild(cancelBtn);
+      dialogButtons.appendChild(confirmBtn);
+      
+      overlay.classList.add('show');
+      
+      // Закрытие по клику на overlay
+      overlay.addEventListener('click', function closeOnOverlay(e){
+        if(e.target === overlay){
+          overlay.classList.remove('show');
+          overlay.removeEventListener('click', closeOnOverlay);
+          setTimeout(() => resolve(false), 300);
+        }
+      });
+    });
+  }
+
+  // Переопределяем глобальные alert и confirm для перехвата всех вызовов
+  // Это гарантирует, что даже если где-то остались старые вызовы, они будут перехвачены
+  window.alert = function(message){
+    console.log('Alert перехвачен:', message);
+    // Проверяем, что функция showToast уже определена
+    if(typeof showToast === 'function'){
+      showToast(message, 'info');
+    } else {
+      // Если showToast еще не определена, используем оригинальный alert
+      console.warn('showToast не определена, используем оригинальный alert');
+      if(window._originalAlert){
+        window._originalAlert(message);
+      }
+    }
+  };
+  
+  // Для confirm используем Promise-based подход
+  // ВАЖНО: Это не идеальная замена синхронного confirm, но работает для большинства случаев
+  window.confirm = function(message){
+    console.log('Confirm перехвачен:', message);
+    // Показываем диалог, но возвращаем Promise
+    // Для синхронного кода это не сработает идеально, но лучше чем ничего
+    let userChoice = false;
+    let isResolved = false;
+    
+    const overlay = $('#dialogOverlay');
+    const dialogTitle = $('#dialogTitle');
+    const dialogMessage = $('#dialogMessage');
+    const dialogButtons = $('#dialogButtons');
+    
+    if(!overlay || !dialogTitle || !dialogMessage || !dialogButtons) {
+      return false;
+    }
+    
+    dialogTitle.textContent = 'Подтверждение';
+    dialogMessage.textContent = message;
+    dialogButtons.innerHTML = '';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'dialog-btn';
+    cancelBtn.textContent = 'Отмена';
+    
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = 'dialog-btn primary';
+    confirmBtn.textContent = 'Подтвердить';
+    
+    const handleChoice = (choice) => {
+      if(isResolved) return;
+      isResolved = true;
+      userChoice = choice;
+      overlay.classList.remove('show');
+      // Удаляем обработчики
+      cancelBtn.onclick = null;
+      confirmBtn.onclick = null;
+      overlay.removeEventListener('click', handleOverlayClick);
+    };
+    
+    cancelBtn.onclick = () => handleChoice(false);
+    confirmBtn.onclick = () => handleChoice(true);
+    
+    const handleOverlayClick = (e) => {
+      if(e.target === overlay) {
+        handleChoice(false);
+      }
+    };
+    
+    dialogButtons.appendChild(cancelBtn);
+    dialogButtons.appendChild(confirmBtn);
+    overlay.classList.add('show');
+    overlay.addEventListener('click', handleOverlayClick);
+    
+    // Возвращаем false по умолчанию (безопасный выбор)
+    // В идеале весь код должен использовать async/await с showDialog()
+    return false; // По умолчанию возвращаем false для безопасности
+  };
+
+  function projectLonLatToSVG(lon, lat, svg){ const vb = svg.viewBox.baseVal; const x = vb.x + ((lon - geoBounds.minLon) / (geoBounds.maxLon - geoBounds.minLon)) * vb.width; const y = vb.y + ((geoBounds.maxLat - lat) / (geoBounds.maxLat - geoBounds.minLat)) * vb.height; return {x,y}; }
+  function projectSVGToLonLat(x,y,svg){ const vb = svg.viewBox.baseVal; const lon = geoBounds.minLon + ((x - vb.x) / vb.width) * (geoBounds.maxLon - geoBounds.minLon); const lat = geoBounds.maxLat - ((y - vb.y) / vb.height) * (geoBounds.maxLat - geoBounds.minLat); return {lon,lat}; }
+  function haversine(lat1,lon1,lat2,lon2){ const R=6371; const toRad=Math.PI/180; const dLat=(lat2-lat1)*toRad; const dLon=(lon2-lon1)*toRad; const a=Math.sin(dLat/2)**2 + Math.cos(lat1*toRad)*Math.cos(lat2*toRad)*Math.sin(dLon/2)**2; const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c; }
+
+  // Safe SVG loader
+  async function loadMap(){
+    const container = $('#mapContainer');
+    try{
+      const res = await fetch(SVG_URL);
+      let text = await res.text();
+      // remove any <script> blocks inside SVG to avoid document.write etc.
+      text = text.replace(/<script[\s\S]*?<\/script>/gi, '');
+      const doc = new DOMParser().parseFromString(text,'image/svg+xml');
+      const svg = doc.documentElement;
+      if(!svg || svg.nodeName.toLowerCase()!=='svg') throw new Error('Нет SVG в ответе');
+      svg.setAttribute('id','ecowasSVG'); svg.style.width='100%'; svg.style.height='auto';
+      container.innerHTML=''; container.appendChild(svg);
+
+      if(!svg.getAttribute('viewBox')){ const bbox = svg.getBBox(); svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`); }
+
+      const ecowasNames = ['benin','burkina','cabo verde','cote d ivoire','côte d ivoire','gambia','ghana','guinea','guinea-bissau','liberia','mali','niger','nigeria','senegal','sierra leone','togo'];
+      const countryEls = Array.from(svg.querySelectorAll('path, g, polygon, rect')).filter(el=>{ const title = el.querySelector && el.querySelector('title'); return title || el.getAttribute('id'); });
+
+      countryEls.forEach(el=>{
+        el.classList.add('country');
+        const titleEl = el.querySelector && el.querySelector('title');
+        const name = (titleEl && titleEl.textContent) || el.getAttribute('id') || '';
+        const nameNorm = name.trim().toLowerCase();
+        el.dataset.name = name.trim();
+        if(ecowasNames.some(n=> nameNorm.includes(n)) || nameNorm.includes('cameroon') || nameNorm.includes('cameroun')){
+          el.classList.add('ecowas-member');
+        }
+        el.addEventListener('mouseenter', e=>{ el.classList.add('hover'); showTooltip(e, name, countryData[name]); });
+        el.addEventListener('mouseleave', ()=>{ el.classList.remove('hover'); hideTooltip(); });
+        el.addEventListener('click', (ev)=>{ ev.stopPropagation(); selectCountry(el.dataset.name || name, el); });
+      });
+
+      // routing clicks (left add, right remove nearest)
+      svg.addEventListener('click', function(ev){
+        if(ev.target.closest('.country')) return;
+        if(ev.button===0){
+          const pt=svg.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+          const ctm=svg.getScreenCTM().inverse(); const local=pt.matrixTransform(ctm);
+          if($('#routeMode') && $('#routeMode').checked){ addRoutePoint(local.x, local.y, svg); }
+        }
+      });
+      svg.addEventListener('contextmenu', function(ev){
+        ev.preventDefault();
+        if(!$('#routeMode') || !$('#routeMode').checked) return;
+        const pt=svg.createSVGPoint(); pt.x=ev.clientX; pt.y=ev.clientY;
+        const ctm=svg.getScreenCTM().inverse(); const local=pt.matrixTransform(ctm);
+        const idx=findNearestRoutePointIndex(local.x, local.y, 20);
+        if(idx>=0){ currentRoute.splice(idx,1); redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); }
+      });
+
+      enablePanZoom(svg);
+      populateDealControls(); renderGlobalTotals();
+    }catch(err){
+      console.error('Ошибка загрузки карты:', err);
+      $('#mapContainer').innerHTML = '<div style="color:#ffb4b4;padding:20px">Не удалось загрузить карту. Проверьте соединение или URL SVG.</div>';
+    }
+  }
+
+  const tooltip = $('#tooltip');
+  function showTooltip(evt,name,data){ if(!tooltip) return; tooltip.style.display='block'; tooltip.innerHTML=`<strong>${name}</strong>${data?`<div class="small">Индекс: ${data.score}</div>`:''}`; positionTooltip(evt.clientX, evt.clientY); }
+  function positionTooltip(x,y){ if(!tooltip) return; const w=tooltip.offsetWidth, h=tooltip.offsetHeight; let left=x+12, top=y+12; if(left+w>window.innerWidth) left = x - w - 16; if(top+h>window.innerHeight) top = y - h - 16; tooltip.style.left=left+'px'; tooltip.style.top=top+'px'; }
+  function hideTooltip(){ if(!tooltip) return; tooltip.style.display='none'; }
+
+  function selectCountry(name, el){
+    $all('.country.selected').forEach(x=>x.classList.remove('selected'));
+    if(el) el.classList.add('selected');
+    const engName = name;
+    const displayName = countryNameMap[engName] || engName;
+    const info = countryData[engName] || {score:'—', gdpBUSD:'—', top_ports:[], exports:{}, imports:{}};
+    const exportsTable = buildCommodityTable(info.exports||{}, 'Экспорт (год)', info.exportsUSD||{});
+    const importsTable = buildCommodityTable(info.imports||{}, 'Импорт (год)', info.importsUSD||{});
+    
+    let nearestHTML='';
+    if(!(info.top_ports && info.top_ports.length)){
+      const nearest = el ? findNearestPortToCountry(el) : null;
+      if(nearest){ nearestHTML = `<div class="small">Ближайший порт: <strong>${nearest.name}</strong> — расстояние ${nearest.distance_km.toFixed(1)} км</div>`; }
+    }
+
+    let portsHTML = '';
+    if(info.top_ports && info.top_ports.length){
+      portsHTML = '<div>' + info.top_ports.map(p=>{
+        const meta = portsDetails[p];
+        if(meta){ return `<div class="port"><div><strong>${p}</strong><div class="small">${countryNameMap[meta.country]||meta.country}</div></div><div class="small">${meta.capacityTEU.toLocaleString()} TEU<br>${meta.maxDraft}</div></div>`; }
+        return `<div class="port"><div><strong>${p}</strong></div><div class="small">—</div></div>`;
+      }).join('') + '</div>';
+    } else {
+      portsHTML = '<div class="small">Нет морских портов</div>';
+    }
+
+    const infoHtml = `<strong>${displayName}</strong><div class="metric"><span>Коммерческий индекс</span><span>${info.score}</span></div><div class="metric"><span>GDP (B USD)</span><span>${info.gdpBUSD||'—'}</span></div><div class="ports-list"><strong>Порты:</strong>${portsHTML}</div>${nearestHTML}<div style="margin-top:8px">${exportsTable}${importsTable}</div>`;
+    const countryInfoEl = $('#countryInfo'); if(countryInfoEl) countryInfoEl.innerHTML = infoHtml;
+    // Автоматически открываем секцию информации о стране при выборе
+    const countryAccordionHeader = document.querySelector('[data-accordion="country"]');
+    const countryAccordionContent = $('#accordion-country');
+    if(countryAccordionHeader && countryAccordionContent && !countryAccordionContent.classList.contains('active')){
+      countryAccordionHeader.classList.add('active');
+      countryAccordionContent.classList.add('active');
+    }
+  }
+
+  function buildCommodityTable(obj,title, usdObj={}){
+    let rows = commodities.map(k=>{
+      const v=(obj&&obj[k])?obj[k]:0; const u=commodityUnits[k]||'';
+      const usdVal = (usdObj && usdObj[k])? usdObj[k] : null;
+      const usdHtml = usdVal ? `<div class="small">≈ $${Number(usdVal).toLocaleString()}</div>` : '';
+      return `<tr><td>${commodityLabels[k]}</td><td style="text-align:right">${v.toLocaleString()} <span class="small">${u}</span>${usdHtml}</td></tr>`;
+    }).join('');
+    return `<div style="margin-top:8px"><strong>${title}</strong><table><tbody>${rows}</tbody></table></div>`;
+  }
+
+  function findNearestPortToCountry(countryEl){
+    try{
+      const svg = $('#ecowasSVG'); if(!svg) return null;
+      const bb = countryEl.getBBox(); const cx = bb.x + bb.width/2; const cy = bb.y + bb.height/2;
+      const {lon:clon, lat:clat} = projectSVGToLonLat(cx,cy,svg);
+      let best=null;
+      for(const [name,coords] of Object.entries(portCoords)){
+        const d = haversine(clat,clon, coords[0], coords[1]);
+        if(!best || d<best.distance_km) best={name, distance_km:d};
+      }
+      return best;
+    }catch(e){ return null; }
+  }
+
+  // Routing
+  function addRoutePoint(x,y,svg){ currentRoute.push({x,y}); redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); }
+  function redrawRoute(svg){
+    if(!svg) return;
+    const ns='http://www.w3.org/2000/svg';
+    let routeGroup = svg.querySelector('#routeGroup');
+    if(!routeGroup){ routeGroup=document.createElementNS(ns,'g'); routeGroup.setAttribute('id','routeGroup'); svg.appendChild(routeGroup); }
+    routeGroup.innerHTML='';
+    if(currentRoute.length===0) return;
+    const poly=document.createElementNS(ns,'polyline');
+    poly.setAttribute('class','route-line');
+    poly.setAttribute('points', currentRoute.map(p=>`${p.x},${p.y}`).join(' '));
+    routeGroup.appendChild(poly);
+    currentRoute.forEach((p,i)=>{
+      const g=document.createElementNS(ns,'g');
+      g.setAttribute('class','route-point'); g.setAttribute('data-idx',i); g.setAttribute('transform',`translate(${p.x},${p.y})`);
+      const c=document.createElementNS(ns,'circle'); c.setAttribute('r',5); g.appendChild(c);
+      g.addEventListener('click', async (ev)=>{ ev.stopPropagation(); const confirmed = await showDialog('Удалить эту точку маршрута?', 'Подтверждение удаления'); if(confirmed){ currentRoute.splice(i,1); redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); } });
+      g.addEventListener('contextmenu',(ev)=>{ ev.preventDefault(); ev.stopPropagation(); currentRoute.splice(i,1); redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); });
+      routeGroup.appendChild(g);
+    });
+  }
+  function findNearestRoutePointIndex(x,y,threshold){
+    if(currentRoute.length===0) return -1;
+    let best=-1, bestDist=Infinity;
+    for(let i=0;i<currentRoute.length;i++){
+      const dx=currentRoute[i].x-x; const dy=currentRoute[i].y-y; const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<bestDist){ bestDist=d; best=i; }
+    }
+    return bestDist<=threshold?best:-1;
+  }
+
+  function renderWaypointsList(){
+    const container = $('#waypointsList'); if(!container) return;
+    if(currentRoute.length===0){ container.innerHTML='Точки маршрута: —'; return; }
+    const rows=currentRoute.map((p,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div>#${i+1}: (${Math.round(p.x)}, ${Math.round(p.y)})</div><div><button data-idx="${i}" class="btn smallBtn">Удалить</button></div></div>`).join('');
+    container.innerHTML=rows;
+    container.querySelectorAll('button[data-idx]').forEach(btn=>{ btn.addEventListener('click', ()=>{ const idx=Number(btn.dataset.idx); currentRoute.splice(idx,1); const svg=$('#ecowasSVG'); redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); }); });
+  }
+  async function clearRoute(){ const confirmed = await showDialog('Очистить маршрут?', 'Подтверждение'); if(!confirmed) return; currentRoute=[]; const svg=$('#ecowasSVG'); if(svg) redrawRoute(svg); renderWaypointsList(); updateRouteSummary(); showToast('Маршрут очищен', 'success'); }
+
+  function updateRouteSummary(){
+    const svg=$('#ecowasSVG'); if(!svg){ const el = $('#routeSummary'); if(el) el.textContent='Маршрут: нет данных'; return; }
+    if(currentRoute.length<2){ $('#routeSummary').textContent='Маршрут: слишком короткий (нужны 2+ точки)'; return; }
+    let total_km=0;
+    for(let i=0;i<currentRoute.length-1;i++){
+      const a=projectSVGToLonLat(currentRoute[i].x,currentRoute[i].y,svg);
+      const b=projectSVGToLonLat(currentRoute[i+1].x,currentRoute[i+1].y,svg);
+      total_km += haversine(a.lat,a.lon,b.lat,b.lon);
+    }
+    const total_nm = total_km/1.852;
+    const qty = Number($('#dealQuantity')?.value) || 1;
+    const freightRate = Number($('#freightRate')?.value) || 0.3;
+    const estimatedFreight = total_nm * qty * freightRate;
+    const rs = $('#routeSummary');
+    if(rs) rs.innerHTML = `Длина маршрута: ${total_km.toFixed(1)} км (${total_nm.toFixed(1)} нм).<br>Оценочный фрахт: $${estimatedFreight.toFixed(2)} при ставке $${freightRate.toFixed(2)} /нм/ед и объёме ${qty}.`;
+    updateContractCardWithCost(estimatedFreight, total_km, total_nm);
+  }
+
+  function updateContractCardWithCost(cost_km, total_km, total_nm){
+    const card=$('#contractParams'); if(!card) return;
+    const commodity = $('#dealCommodity')?.value || '';
+    const qty = Number($('#dealQuantity')?.value)||0;
+    const price = Number($('#dealPrice')?.value)||0;
+    const from = $('#dealFrom')?.value || '';
+    const to = $('#dealTo')?.value || '';
+    const date = $('#dealDate')?.value || '—';
+    const totalGoodsValue = (qty * price).toFixed(2);
+    const fromDisplay = countryNameMap[from] || from;
+    const toDisplay = countryNameMap[to] || to;
+    card.innerHTML = `<div>Товар: <strong>${commodityLabels[commodity]||commodity}</strong></div><div>Количество: <strong>${qty}</strong></div><div>Цена за ед.: <strong>$${price}</strong></div><div>От: <strong>${fromDisplay}</strong> → До: <strong>${toDisplay}</strong></div><div>Дата отгрузки: <strong>${date}</strong></div><div style="margin-top:6px">Стоимость товара: <strong>$${totalGoodsValue}</strong></div><div>Оценочный фрахт: <strong>$${cost_km.toFixed(2)}</strong></div><div>Длина маршрута: <strong>${total_km.toFixed(1)} км (${total_nm.toFixed(1)} нм)</strong></div>`;
+  }
+
+  function exportRouteGeoJSON(){
+    if(currentRoute.length<2){ showToast('Маршрут должен содержать минимум 2 точки.', 'warning'); return; }
+    const line={type:'Feature',properties:{name:'ECOWAS route',projection:'svg'},geometry:{type:'LineString',coordinates:currentRoute.map(p=>[p.x,p.y])}};
+    const geo={type:'FeatureCollection',features:[line]};
+    const blob=new Blob([JSON.stringify(geo,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='ecowas_route.geojson'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast('Маршрут экспортирован в GeoJSON', 'success');
+  }
+
+  function populateDealControls(){
+    const sel=$('#dealCommodity'); if(sel){ commodities.forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = commodityLabels[k]||k; sel.appendChild(opt); }); }
+    const countries = Object.keys(countryData); const from=$('#dealFrom'), to=$('#dealTo');
+    if(from && to){ countries.forEach(eng=>{ const rus = countryNameMap[eng] || eng; const o1=document.createElement('option'); o1.value=eng; o1.textContent=rus; from.appendChild(o1); const o2=document.createElement('option'); o2.value=eng; o2.textContent=rus; to.appendChild(o2); }); }
+    const contractCard = $('#contractCard'); if(contractCard && !$('#freightRate')){ const cont = document.createElement('div'); cont.style.marginTop='8px'; cont.innerHTML = '<input id="freightRate" class="input" style="width: 96%;" type="number" min="0" step="0.01" placeholder="Ставка фрахта ($/нм/ед) — по умолчанию 0.30" />'; contractCard.insertBefore(cont, contractCard.children[1]); }
+  }
+
+  function renderGlobalTotals(){
+    const totals={}; commodities.forEach(c=>totals[c]=0);
+    Object.values(countryData).forEach(cd=>{ commodities.forEach(c=>{ totals[c] += (cd.exports && cd.exports[c])?cd.exports[c]:0; }); });
+    const lines = commodities.map(c=>`<div style="display:flex;justify-content:space-between"><div>${commodityLabels[c]}</div><div>${totals[c].toLocaleString()} <span class="small">${commodityUnits[c]||''}</span></div></div>`).join('');
+    const el = $('#globalTotals'); if(el) el.innerHTML = lines;
+  }
+
+  // Custom cursor: scale remote image into dataURL and apply (fallback safe)
+  const mapCursorUrl = 'https://blockchainaccreditive.github.io/img/cursor2.png';
+  function createScaledCursorDataURL(srcUrl, size){
+    return new Promise((resolve)=>{
+      const img=new Image(); img.crossOrigin='anonymous';
+      img.onload = ()=>{
+        try{
+          const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,size,size);
+          const ar = img.width/img.height; let w=size, h=size;
+          if(ar>1){ h = size/ar; } else { w = size*ar; }
+          const dx = (size - w)/2; const dy = (size - h)/2; ctx.drawImage(img, dx, dy, w, h);
+          resolve(canvas.toDataURL('image/png'));
+        }catch(e){ resolve(srcUrl); }
+      };
+      img.onerror = ()=>{ resolve(srcUrl); };
+      img.src = srcUrl;
+    });
+  }
+
+  async function enableCustomCursor(){
+    try{
+      const mc = $('#mapContainer'); if(!mc) return;
+      const dataUrl = await createScaledCursorDataURL(mapCursorUrl,48);
+      const cursorValue = (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) ? `url(${dataUrl}) 24 24, auto` : `url(${mapCursorUrl}) 24 24, auto`;
+      // Apply on container and svg (if present). Use event listeners to avoid forcing cursor before load.
+      mc.addEventListener('mouseenter', ()=>{
+        try{ mc.style.cursor = cursorValue; const svg = $('#ecowasSVG'); if(svg) svg.style.cursor = cursorValue; }catch(e){}
+      });
+      mc.addEventListener('mouseleave', ()=>{ try{ mc.style.cursor = 'default'; const svg = $('#ecowasSVG'); if(svg) svg.style.cursor = 'default'; }catch(e){} });
+      // Also attempt to inject a style rule (some browsers prefer stylesheet cursor rules)
+      try{
+        const style = document.createElement('style');
+        style.setAttribute('data-generated','cursor');
+        style.textContent = `#mapContainer, #mapContainer svg, #ecowasSVG { cursor: ${cursorValue}; }`;
+        document.head.appendChild(style);
+      }catch(e){ /* ignore */ }
+    }catch(e){ console.warn('Не удалось установить кастомный курсор', e); }
+  }
+
+  function exportJSON(){
+    const portsObj = {};
+    for(const [p,coords] of Object.entries(portCoords)){
+      portsObj[p] = { coords: coords, details: portsDetails[p] || {} };
+    }
+    const countriesObj = {};
+    for(const [c,cd] of Object.entries(countryData)){
+      countriesObj[c] = { exports: cd.exports||{}, imports: cd.imports||{}, gdpBUSD: cd.gdpBUSD||null, score: cd.score||null, exportsUSD: cd.exportsUSD||{} };
+    }
+    const data={generatedAt:new Date().toISOString(), ports: portsObj, countries: countriesObj};
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='ecowas_ports_list.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast('Данные портов экспортированы в JSON', 'success');
+  }
+
+  // Сохраняем исходный viewBox для сброса
+  let originalViewBox = null;
+
+  function resetMapView(){
+    const svg = $('#ecowasSVG');
+    if(!svg) return;
+    if(originalViewBox){
+      svg.setAttribute('viewBox', originalViewBox);
+    } else {
+      const bbox = svg.getBBox();
+      const vb = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+      svg.setAttribute('viewBox', vb);
+      originalViewBox = vb;
+    }
+  }
+
+  function enablePanZoom(svg){
+    try{
+      if(!svg) return;
+      let vb = svg.viewBox.baseVal;
+      if(!vb || (vb.width===0 && vb.height===0)){ const bbox = svg.getBBox(); svg.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`); vb = svg.viewBox.baseVal; }
+      // Сохраняем исходный viewBox при первой загрузке
+      if(!originalViewBox){
+        originalViewBox = svg.getAttribute('viewBox');
+      }
+      svg.addEventListener('wheel', (e)=>{ e.preventDefault(); const delta = -e.deltaY; const zoomFactor = delta>0?0.9:1.1; const mx = e.clientX, my = e.clientY; const pt = svg.createSVGPoint(); pt.x = mx; pt.y = my; const ctm = svg.getScreenCTM().inverse(); const p = pt.matrixTransform(ctm); const newW = vb.width * zoomFactor; const newH = vb.height * zoomFactor; vb.x = p.x - (p.x - vb.x) * (newW / vb.width); vb.y = p.y - (p.y - vb.y) * (newH / vb.height); vb.width = newW; vb.height = newH; });
+      let dragging=false, start=null;
+      svg.addEventListener('pointerdown', (e)=>{ if(e.button!==0) return; dragging=true; const pt = svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY; const ctm = svg.getScreenCTM().inverse(); start = pt.matrixTransform(ctm); svg.style.cursor='grabbing'; });
+      window.addEventListener('pointermove', (e)=>{ if(!dragging) return; const pt = svg.createSVGPoint(); pt.x=e.clientX; pt.y=e.clientY; const ctm = svg.getScreenCTM().inverse(); const p = pt.matrixTransform(ctm); const dx = p.x - start.x; const dy = p.y - start.y; vb.x -= dx; vb.y -= dy; });
+      window.addEventListener('pointerup', ()=>{ dragging=false; svg.style.cursor='default'; });
+    }catch(e){ console.warn('panzoom failed',e); }
+  }
+
+  function findNearestPortToPoint(lon,lat){
+    let best=null;
+    for(const [name,coords] of Object.entries(portCoords)){
+      const d = haversine(lat,lon,coords[0],coords[1]);
+      if(!best || d<best.distance_km) best={name,distance_km:d};
+    }
+    return best;
+  }
+
+  // Функция инициализации аккордеона
+  function initAccordion(){
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    accordionHeaders.forEach(header => {
+      header.addEventListener('click', function(){
+        const accordionId = this.getAttribute('data-accordion');
+        const content = $(`#accordion-${accordionId}`);
+        const isActive = this.classList.contains('active');
+        
+        // Закрываем все другие секции (опционально - можно разрешить множественное открытие)
+        // accordionHeaders.forEach(h => {
+        //   if(h !== this){
+        //     h.classList.remove('active');
+        //     const otherId = h.getAttribute('data-accordion');
+        //     const otherContent = $(`#accordion-${otherId}`);
+        //     if(otherContent) otherContent.classList.remove('active');
+        //   }
+        // });
+        
+        // Переключаем текущую секцию
+        if(isActive){
+          this.classList.remove('active');
+          if(content) content.classList.remove('active');
+        } else {
+          this.classList.add('active');
+          if(content) content.classList.add('active');
+        }
+      });
+    });
+  }
+
+  // Init handlers
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // Убеждаемся, что переопределение alert/confirm работает
+    console.log('Инициализация: alert переопределен:', typeof window.alert);
+    console.log('Инициализация: confirm переопределен:', typeof window.confirm);
+    loadMap(); enableCustomCursor(); initAccordion();
+    const clearBtn = $('#clearRoute'); if(clearBtn) clearBtn.addEventListener('click', ()=>clearRoute());
+    const expRoute = $('#exportRoute'); if(expRoute) expRoute.addEventListener('click', ()=>exportRouteGeoJSON());
+    const expBtn = $('#exportBtn'); if(expBtn) expBtn.addEventListener('click', ()=>exportJSON());
+    const resetBtn = $('#resetBtn'); if(resetBtn) resetBtn.addEventListener('click', ()=>resetMapView());
+    const signBtn = $('#signContract'); if(signBtn) signBtn.addEventListener('click', ()=>{ showToast('Контракт подписан. Состояние сохранено.', 'success'); });
+    const simBtn = $('#simulateCost'); if(simBtn) simBtn.addEventListener('click', ()=>{ updateRouteSummary(); });
+    // safe input listeners
+    const dc = $('#dealCommodity'); if(dc) dc.addEventListener('change', ()=>{ updateContractCardWithCost(0,0,0); });
+    const dq = $('#dealQuantity'); if(dq) dq.addEventListener('input', ()=>{ updateContractCardWithCost(0,0,0); });
+    const dp = $('#dealPrice'); if(dp) dp.addEventListener('input', ()=>{ updateContractCardWithCost(0,0,0); });
+    const df = $('#dealFrom'); if(df) df.addEventListener('change', ()=>{ updateContractCardWithCost(0,0,0); });
+    const dt = $('#dealTo'); if(dt) dt.addEventListener('change', ()=>{ updateContractCardWithCost(0,0,0); });
+    const dd = $('#dealDate'); if(dd) dd.addEventListener('change', ()=>{ updateContractCardWithCost(0,0,0); });
+  });
+  </script>
+</body>
+</html>
