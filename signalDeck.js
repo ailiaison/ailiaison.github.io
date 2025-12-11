@@ -164,13 +164,11 @@
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      background: radial-gradient(circle at 0 0, rgba(34,211,238,0.8), rgba(37,99,235,1));
       color: #f9fafb;
       font-size: 0.8rem;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      box-shadow: 0 10px 24px rgba(37,99,235,0.9);
       display: inline-flex;
       gap: 6px;
       align-items: center;
