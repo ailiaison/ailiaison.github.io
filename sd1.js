@@ -284,9 +284,9 @@
               '<div class="sd-index-value" id="sdIndexValue">0.0</div>' +
               '<div id="sdIndexTrend" class="sd-index-trend sd-index-trend-pos">waiting for signals…</div>' +
             "</div>" +
-            '<div class="sd-index-caption">' +
+            '<div class="sd-index-caption"><!--' +
               "Synthetic \"payout advantage\" index. Higher values mean stronger FX edge to lock in deals now." +
-            "</div>" +
+            "--></div>" +
           "</div>" +
           (hasChartJs
             ? '<div class="sd-chart-main"><canvas id="sdIndexChart"></canvas></div>' +
