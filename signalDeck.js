@@ -369,8 +369,8 @@
       '<div>' +
         '<h2 class="sd-title">Signal Deck — FX & risk radar</h2>' +
         '<p class="sd-subtitle">' +
-          'Simulated module that helps exporters turn intuitive commodity trading into a ' +
-          'data-driven process: FX windows, geopolitical signals and logistics hints.' +
+          '<!-- Simulated module that helps exporters turn intuitive commodity trading into a ' +
+          'data-driven process: FX windows, geopolitical signals and logistics hints. -->' +
         "</p>" +
       "</div>" +
       '<div class="sd-pill">' +
