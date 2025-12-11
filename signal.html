@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Liaison Signal Deck — Commodity Deal Timing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #020617;
+      --card-bg: rgba(15, 23, 42, 0.96);
+      --border-soft: rgba(148, 163, 184, 0.3);
+      --accent: #38bdf8;
+      --accent-2: #6366f1;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --warn: #eab308;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #020617 0, #020617 35%, #000000 100%);
+      color: var(--text-main);
+    }
+
+    .app {
+      min-height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .title-block h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .title-block p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 480px;
+    }
+
+    .signal-legend {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .dot-wait   { background: #4b5563; }
+    .dot-watch  { background: var(--warn); }
+    .dot-window { background: var(--success); }
+
+    .tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 1000px) {
+      .tiles-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tiles-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+
+    .tile {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: 28px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 150px;
+    }
+
+    .tile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c7ddff;
+    }
+
+    .tile-header span.icon {
+      font-size: 1.4rem;
+      margin-right: 6px;
+    }
+
+    .tile-main {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tile-price {
+      font-size: 1.9rem;
+      font-weight: 700;
+    }
+
+    .tile-unit {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .tile-subrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .trend-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .trend-up   { color: var(--success); border-color: rgba(74, 222, 128, 0.7); }
+    .trend-down { color: var(--danger);  border-color: rgba(248, 113, 113, 0.8); }
+    .trend-flat { color: #e5e7eb; }
+
+    .signal-pill {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .signal-wait {
+      background: rgba(55, 65, 81, 0.7);
+      color: #e5e7eb;
+    }
+    .signal-watch {
+      background: rgba(250, 204, 21, 0.18);
+      color: var(--warn);
+    }
+    .signal-window {
+      background: rgba(22, 163, 74, 0.22);
+      color: var(--success);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 2px;
+    }
+
+    @media (min-width: 960px) {
+      main {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95));
+      border-radius: 18px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.96);
+      padding: 12px 14px 14px;
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #e5e7eb;
+    }
+
+    .card p {
+      margin: 2px 0 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-left {
+      flex: 3 1 0;
+      min-width: 0;
+    }
+
+    .card-right {
+      flex: 2 1 0;
+      min-width: 0;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 260px;
+      margin-top: 6px;
+    }
+
+    .mini-chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .mini-chart {
+      height: 130px;
+      position: relative;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-muted);
+    }
+
+    .chip-strong { border-color: rgba(34, 197, 94, 0.7); color: var(--success); }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+      align-items: center;
+      font-size: 0.78rem;
+    }
+
+    .controls-row label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      color: var(--text-muted);
+    }
+
+    .controls-row input[type="range"] {
+      width: 180px;
+    }
+
+    .toggle-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+    }
+
+    footer {
+      margin-top: auto;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: right;
+      opacity: 0.75;
+      padding-top: 4px;
+    }
+
+    .toast-container {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      max-width: 320px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
+      border-radius: 18px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.98);
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      opacity: 0;
+      transform: translateY(12px);
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .toast-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #22c55e, #15803d);
+      color: white;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .toast-body strong {
+      font-size: 0.8rem;
+    }
+
+    .toast-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toast.show {
+      animation: toast-in 0.42s ease-out forwards;
+    }
+
+    .toast.hide {
+      animation: toast-out 0.32s ease-in forwards;
+    }
+
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toast-out {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(14px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-block">
+        <h1>AI Liaison Signal Deck</h1>
+        <p>
+          Simulation dashboard that turns intuitive commodity trading into a data-driven,
+          signal-based workflow for crude oil, products, grain and fertilizers.
+        </p>
+      </div>
+      <div class="signal-legend">
+        <div class="legend-row">
+          <span class="legend-dot dot-wait"></span><span>WAIT — no clear edge</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-dot dot-watch"></span><span>WATCH — volatility building up</span>
+        </div>
+        <div class="legend-row">
+          <span class="legend-dot dot-window"></span><span>BUY WINDOW — best timing zone</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="tiles-grid" id="tilesGrid"></section>
+
+    <main>
+      <section class="card card-left">
+        <h2>Global deal-timing radar</h2>
+        <p>
+          Composite index aggregating simulated price momentum and volatility across all four
+          commodities. Signals are generated when short-term momentum and risk premia align.
+        </p>
+        <div class="chart-wrapper">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div class="controls-row">
+          <label>
+            Signal sensitivity
+            <input type="range" id="sensitivitySlider" min="1" max="5" step="1" value="3" />
+          </label>
+          <label>
+            Simulation speed
+            <input type="range" id="speedSlider" min="400" max="2000" step="200" value="1000" />
+          </label>
+          <div class="toggle-group">
+            <label class="toggle">
+              <input type="checkbox" data-commodity="crude" checked /> Crude oil
+            </label>
+            <label class="toggle">
+              <input type="checkbox" data-commodity="products" checked /> Oil products
+            </label>
+            <label class="toggle">
+              <input type="checkbox" data-commodity="grain" checked /> Grain
+            </label>
+            <label class="toggle">
+              <input type="checkbox" data-commodity="fert" checked /> Fertilizers
+            </label>
+          </div>
+        </div>
+        <div class="chip-row">
+          <span class="chip chip-strong">AI-generated timing hints</span>
+          <span class="chip">No real market data — pure simulation</span>
+          <span class="chip">Designed for ECOWAS ↔ Russia export flows</span>
+        </div>
+      </section>
+
+      <section class="card card-right">
+        <h2>Per-commodity microstructure</h2>
+        <p>
+          Each мини-chart shows simulated short-term price action. Deal signals are based on
+          the relationship between fast and slow momentum bands.
+        </p>
+        <div class="mini-chart-grid">
+          <div class="mini-chart"><canvas id="chartCrude"></canvas></div>
+          <div class="mini-chart"><canvas id="chartProducts"></canvas></div>
+          <div class="mini-chart"><canvas id="chartGrain"></canvas></div>
+          <div class="mini-chart"><canvas id="chartFert"></canvas></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Prototype for AI Liaison officer. For demonstration only — not investment advice and not real-time market data.
+    </footer>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    const COMMODITIES = [
+      { key: "crude", name: "Crude oil", icon: "🛢", unit: "/bbl", base: 78 },
+      { key: "products", name: "Refined products", icon: "⛽", unit: "/t", base: 650 },
+      { key: "grain", name: "Wheat", icon: "🌾", unit: "/t", base: 230 },
+      { key: "fert", name: "Fertilizers", icon: "🧪", unit: "/t", base: 520 }
+    ];
+
+    const state = {
+      sensitivity: 3,
+      intervalMs: 1000,
+      allowed: { crude: true, products: true, grain: true, fert: true },
+      points: 50
+    };
+
+    const priceHistory = {};
+    COMMODITIES.forEach((c) => { priceHistory[c.key] = []; });
+
+    function randn() {
+      let sum = 0;
+      for (let i = 0; i < 6; i++) sum += Math.random();
+      return sum / 6 - 0.5;
+    }
+
+    const tilesGrid = document.getElementById("tilesGrid");
+
+    function createTileElement(commodity) {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.dataset.key = commodity.key;
+      tile.innerHTML =
+        '<div class="tile-header">' +
+          '<div>' +
+            '<span class="icon">' + commodity.icon + '</span>' +
+            '<span>' + commodity.name.toUpperCase() + '</span>' +
+          '</div>' +
+          '<div class="signal-pill signal-wait" data-role="signal-pill">WAIT</div>' +
+        '</div>' +
+        '<div class="tile-main">' +
+          '<span class="tile-price" data-role="price">-</span>' +
+          '<span class="tile-unit">' + commodity.unit + '</span>' +
+        '</div>' +
+        '<div class="tile-subrow">' +
+          '<span data-role="trend-label">no trend yet</span>' +
+          '<span class="trend-badge trend-flat" data-role="trend-badge">flat</span>' +
+        '</div>' +
+        '<div class="tile-subrow">' +
+          '<span class="tile-subnote" data-role="subnote">waiting for market structure...</span>' +
+          '<span data-role="timestamp"></span>' +
+        '</div>';
+      return tile;
+    }
+
+    COMMODITIES.forEach((c) => { tilesGrid.appendChild(createTileElement(c)); });
+
+    function updateTile(key, price, trendDir, signalLevel) {
+      const tile = tilesGrid.querySelector('.tile[data-key="' + key + '"]');
+      if (!tile) return;
+
+      const priceEl = tile.querySelector('[data-role="price"]');
+      const trendLabelEl = tile.querySelector('[data-role="trend-label"]');
+      const trendBadgeEl = tile.querySelector('[data-role="trend-badge"]');
+      const signalPill = tile.querySelector('[data-role="signal-pill"]');
+      const tsEl = tile.querySelector('[data-role="timestamp"]');
+      const subnoteEl = tile.querySelector('[data-role="subnote"]');
+
+      if (priceEl) priceEl.textContent = price.toFixed(2);
+
+      if (trendBadgeEl) {
+        trendBadgeEl.classList.remove("trend-up", "trend-down", "trend-flat");
+        if (trendDir > 0.1) {
+          trendBadgeEl.classList.add("trend-up");
+          trendBadgeEl.textContent = "uptrend";
+          if (trendLabelEl) trendLabelEl.textContent = "short-term momentum ↑";
+        } else if (trendDir < -0.1) {
+          trendBadgeEl.classList.add("trend-down");
+          trendBadgeEl.textContent = "downtrend";
+          if (trendLabelEl) trendLabelEl.textContent = "short-term momentum ↓";
+        } else {
+          trendBadgeEl.classList.add("trend-flat");
+          trendBadgeEl.textContent = "sideways";
+          if (trendLabelEl) trendLabelEl.textContent = "range-bound structure";
+        }
+      }
+
+      if (signalPill) {
+        signalPill.classList.remove("signal-wait", "signal-watch", "signal-window");
+        if (signalLevel === "window") {
+          signalPill.classList.add("signal-window");
+          signalPill.textContent = "BUY WINDOW";
+          if (subnoteEl) subnoteEl.textContent = "timing edge detected";
+        } else if (signalLevel === "watch") {
+          signalPill.classList.add("signal-watch");
+          signalPill.textContent = "WATCH";
+          if (subnoteEl) subnoteEl.textContent = "volatility building up";
+        } else {
+          signalPill.classList.add("signal-wait");
+          signalPill.textContent = "WAIT";
+          if (subnoteEl) subnoteEl.textContent = "no clear statistical edge";
+        }
+      }
+
+      if (tsEl) {
+        const now = new Date();
+        tsEl.textContent =
+          String(now.getHours()).padStart(2, '0') + ':' +
+          String(now.getMinutes()).padStart(2, '0') + ':' +
+          String(now.getSeconds()).padStart(2, '0');
+      }
+    }
+
+    const ctxRadar = document.getElementById("radarChart").getContext("2d");
+    const ctxCrude = document.getElementById("chartCrude").getContext("2d");
+    const ctxProducts = document.getElementById("chartProducts").getContext("2d");
+    const ctxGrain = document.getElementById("chartGrain").getContext("2d");
+    const ctxFert = document.getElementById("chartFert").getContext("2d");
+
+    function makeSparkline(ctx, label) {
+      return new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            label: label,
+            data: [],
+            borderColor: "#38bdf8",
+            backgroundColor: "rgba(56,189,248,0.15)",
+            borderWidth: 1.5,
+            tension: 0.35,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { display: false },
+            y: { display: false }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        }
+      });
+    }
+
+    const chartCrude = makeSparkline(ctxCrude, "Crude");
+    const chartProducts = makeSparkline(ctxProducts, "Products");
+    const chartGrain = makeSparkline(ctxGrain, "Grain");
+    const chartFert = makeSparkline(ctxFert, "Fert");
+
+    const radarChart = new Chart(ctxRadar, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Composite timing index",
+          data: [],
+          borderColor: "#6366f1",
+          backgroundColor: "rgba(99,102,241,0.25)",
+          borderWidth: 1.8,
+          tension: 0.35,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { display: false },
+          y: {
+            display: true,
+            ticks: {
+              color: "#6b7280",
+              callback: (v) => (v > 0 ? "+" + v : v)
+            },
+            grid: { color: "rgba(30,64,175,0.45)" }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        }
+      }
+    });
+
+    function pushDataToChart(chart, value) {
+      const labels = chart.data.labels;
+      const data = chart.data.datasets[0].data;
+      labels.push("");
+      data.push(value);
+      if (data.length > state.points) {
+        data.shift();
+        labels.shift();
+      }
+      chart.update("none");
+    }
+
+    function movingAverage(arr, window) {
+      if (arr.length < window) return null;
+      let sum = 0;
+      for (let i = arr.length - window; i < arr.length; i++) sum += arr[i];
+      return sum / window;
+    }
+
+    let simTimer = null;
+
+    function computeSignalLevel(priceArr, sensitivity) {
+      if (priceArr.length < 10) return "wait";
+      const last = priceArr[priceArr.length - 1];
+      const prev = priceArr[priceArr.length - 2];
+      const shortMA = movingAverage(priceArr, 5);
+      const longMA = movingAverage(priceArr, 15);
+      if (shortMA == null || longMA == null) return "wait";
+
+      const momentum = ((shortMA - longMA) / longMA) * 100;
+      const tickChange = ((last - prev) / prev) * 100;
+      const edgeScore = momentum * 0.7 + tickChange * 0.3;
+
+      const baseThreshold = 0.18 * sensitivity;
+      const watchThreshold = baseThreshold * 0.7;
+
+      if (edgeScore > baseThreshold) return "window";
+      if (edgeScore > watchThreshold) return "watch";
+      return "wait";
+    }
+
+    function computeTrendDir(priceArr) {
+      if (priceArr.length < 4) return 0;
+      const last = priceArr[priceArr.length - 1];
+      const before = priceArr[priceArr.length - 4];
+      return ((last - before) / before) * 100;
+    }
+
+    const toastContainer = document.getElementById("toastContainer");
+    let toastTimeout = null;
+
+    function showSignalToast(commodity, price, edgeScoreText) {
+      if (toastTimeout) {
+        clearTimeout(toastTimeout);
+        toastTimeout = null;
+      }
+      toastContainer.innerHTML = "";
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.innerHTML =
+        '<div class="toast-icon">📈</div>' +
+        '<div class="toast-body">' +
+          '<strong>BUY window — ' + commodity.name + '</strong>' +
+          '<div>' + edgeScoreText + '</div>' +
+          '<div class="toast-meta">Simulated hint: align pricing, logistics and documents now.</div>' +
+        '</div>';
+      toastContainer.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+        toast.classList.add("hide");
+        setTimeout(() => {
+          if (toast.parentNode === toastContainer) toastContainer.removeChild(toast);
+        }, 320);
+      }, 6000);
+    }
+
+    function stepSimulation() {
+      let composite = 0;
+      let activeCount = 0;
+
+      COMMODITIES.forEach((c) => {
+        const vol =
+          c.key === "crude" || c.key === "products" ? 0.6 :
+          c.key === "grain" ? 0.5 : 0.7;
+
+        const history = priceHistory[c.key];
+        const last = history.length ? history[history.length - 1] : c.base;
+        const drift = randn() * vol;
+        const newPrice = Math.max(1, last + drift);
+        history.push(newPrice);
+        if (history.length > state.points) history.shift();
+
+        const signalLevel = computeSignalLevel(history, state.sensitivity);
+        const trend = computeTrendDir(history);
+
+        updateTile(c.key, newPrice, trend, signalLevel);
+
+        if (c.key === "crude") pushDataToChart(chartCrude, newPrice);
+        else if (c.key === "products") pushDataToChart(chartProducts, newPrice);
+        else if (c.key === "grain") pushDataToChart(chartGrain, newPrice);
+        else if (c.key === "fert") pushDataToChart(chartFert, newPrice);
+
+        if (state.allowed[c.key]) {
+          const norm = (newPrice - c.base) / c.base;
+          composite += norm * 100;
+          activeCount++;
+        }
+
+        if (state.allowed[c.key] && signalLevel === "window" && Math.random() < 0.35) {
+          const maShort = movingAverage(history, 5);
+          const maLong = movingAverage(history, 15);
+          let text = "Fast momentum is above slow band; simulated volatility is supportive.";
+          if (maShort != null && maLong != null) {
+            const diff = ((maShort - maLong) / maLong) * 100;
+            text =
+              "Fast band is " + diff.toFixed(2) + "% above slow band; this window favours exporters and structured deals.";
+          }
+          showSignalToast(c, newPrice, text);
+        }
+      });
+
+      if (activeCount === 0) activeCount = 1;
+      const compositeIndex = composite / activeCount;
+      pushDataToChart(radarChart, compositeIndex);
+    }
+
+    function restartSimulation() {
+      if (simTimer) clearInterval(simTimer);
+      simTimer = setInterval(stepSimulation, state.intervalMs);
+    }
+
+    document.getElementById("sensitivitySlider").addEventListener("input", (e) => {
+      state.sensitivity = Number(e.target.value) || 3;
+    });
+
+    document.getElementById("speedSlider").addEventListener("input", (e) => {
+      const val = Number(e.target.value) || 1000;
+      state.intervalMs = val;
+      restartSimulation();
+    });
+
+    document.querySelectorAll('.toggle input[type="checkbox"]').forEach((cb) => {
+      cb.addEventListener("change", (e) => {
+        const key = e.target.dataset.commodity;
+        state.allowed[key] = e.target.checked;
+      });
+    });
+
+    restartSimulation();
+  </script>
+</body>
+</html>
