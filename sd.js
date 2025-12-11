@@ -13,7 +13,6 @@
   const style = document.createElement("style");
   style.textContent = `
     .sd-root {
-      margin-top: 16px;
       background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
       border-radius: 18px;
       border: 1px solid rgba(148,163,184,0.35);
