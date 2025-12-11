@@ -85,7 +85,7 @@
       "align-items:center;" +
     "}" +
     ".sd-btn-primary{" +
-      "padding:7px 12px;border-radius:999px;border:none;cursor:pointer;" +
+      "padding:7px 12px;border-radius:8px;border:none;cursor:pointer;" +
       "background:linear-gradient(135deg,#22d3ee,#2563eb);" +
       "color:#f9fafb;font-size:0.8rem;font-weight:600;" +
       "letter-spacing:0.08em;text-transform:uppercase;" +
@@ -270,7 +270,7 @@
           "</div>" +
           '<div class="sd-chip-row">' +
             '<span class="sd-chip sd-chip-strong">FX windows: local currency weakness vs settlement currency</span>' +
-            '<span class="sd-chip">Geopolitics / narrative risk (conceptual, simulated)</span>' +
+            '<span class="sd-chip">Geopolitics / narrative risk (conceptual)</span>' +
             '<span class="sd-chip">Logistics frictions & hedging hints (conceptual)</span>' +
           "</div>" +
         "</div>" +
