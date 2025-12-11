@@ -1,4 +1,3 @@
-// signalDeck.js — embedded Signal Deck module for .sig container
 (function () {
   // ---------- 0. FIND HOST ----------
   var host = document.querySelector(".sig");
@@ -16,7 +15,6 @@
       "margin-top:0;" +
       "background:radial-gradient(circle at top left,rgba(15,23,42,0.9),rgba(15,23,42,0.98));" +
       "border-radius:18px;" +
-      "border:1px solid rgba(148,163,184,0.35);" +
       "padding:12px 14px 16px;" +
       "font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;" +
       "color:var(--text-main,#e5e7eb);" +
