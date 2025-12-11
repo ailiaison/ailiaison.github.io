@@ -17,7 +17,6 @@
       background: radial-gradient(circle at top left, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
       border-radius: 18px;
       border: 1px solid rgba(148,163,184,0.35);
-      box-shadow: 0 18px 40px rgba(15,23,42,0.96);
       padding: 12px 14px 16px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text-main, #e5e7eb);
@@ -165,13 +164,11 @@
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      background: radial-gradient(circle at 0 0, rgba(34,211,238,0.8), rgba(37,99,235,1));
       color: #f9fafb;
       font-size: 0.8rem;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      box-shadow: 0 10px 24px rgba(37,99,235,0.9);
       display: inline-flex;
       gap: 6px;
       align-items: center;
