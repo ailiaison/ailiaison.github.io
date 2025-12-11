@@ -1,4 +1,3 @@
-// signalDeck.js — embedded Signal Deck module for .sig container
 (function () {
   // ---------- 0. FIND HOST ----------
   var host = document.querySelector(".sig");
@@ -239,7 +238,7 @@
       '<div class="sd-col sd-col-left">' +
         '<div class="sd-card">' +
           "<h3>Deal parameters</h3>" +
-          "<p>Parameters are auto-fetched from the main AI Liaison form. You may still edit them here.</p>" +
+          "<p>Parameters are auto-fetched from the main AI Liaison Officer form.<!--You may still edit them here.--></p>" +
           '<form id="sdDealForm">' +
             '<div class="sd-form-grid">' +
               '<div class="sd-field">' +
@@ -279,7 +278,7 @@
       '<div class="sd-col sd-col-right">' +
         '<div class="sd-card">' +
           "<h3>FX opportunity scanner</h3>" +
-          "<p>Simulated FX pairs that could maximise local-currency proceeds for your deal.</p>" +
+          "<p><!--Simulated FX pairs that could maximise local-currency proceeds for your deal.--></p>" +
           '<div class="sd-index-row">' +
             '<div>' +
               '<div class="sd-index-value" id="sdIndexValue">0.0</div>' +
