@@ -505,7 +505,7 @@
     var m = deal.market || "target market";
 
     summaryEl.innerHTML =
-      "Simulating signals for <b>" +
+      "Signals for <b>" +
       c +
       "</b> exported from <b>" +
       e +
