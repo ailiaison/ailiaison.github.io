@@ -274,7 +274,7 @@
             "</div>" +
             '<div class="sd-form-actions">' +
               '<button type="submit" class="sd-btn-primary">' +
-                "<span>Run signal simulation</span>" +
+                "<span>Run signal</span>" +
               "</button>" +
               '<span><!-- Simulation only. No real market, news or port data — logic is mocked for demo. --></span>' +
             "</div>" +
